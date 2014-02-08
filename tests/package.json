@@ -1,0 +1,12 @@
+{
+    "name": "publish-composite-tests",
+    "version": "0.0.1",
+    "devDependencies": {
+        "grunt": "",
+        "grunt-contrib-jshint": "",
+        "grunt-simple-mocha": "",
+        "should": "",
+        "underscore": ""
+    },
+    "dependencies": {}
+}

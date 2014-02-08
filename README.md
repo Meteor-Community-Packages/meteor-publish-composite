@@ -49,7 +49,8 @@ Arguments
                         find: function(secondTierDocument, topLevelDocument) {
                             // Called for each second tier document. These find functions
                             // will receive all parent documents starting with the nearest
-                            // parent and working all the way up to the top level.
+                            // parent and working all the way up to the top level as
+                            // arguments.
                             // Should return a cursor of third tier documents.
                         },
                         children: [
