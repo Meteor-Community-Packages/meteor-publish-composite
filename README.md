@@ -19,18 +19,21 @@ This package defines one new Meteor function:
 
 Arguments
 
-* **name** -- *String*
+* **name** -- *string*
 
     The name of the publication
 
-* **options** -- *JSON object or callback function*
+* **options** -- *object literal or callback function*
 
-    A JSON object specifying the configuration of the composite **or** a function that will
-    receive some arguments from a call to `Meteor.subscribe(...)` and return a JSON object. Basically,
-    if your publication will take **no** arguments, pass a JSON object for this argument. If your
-    publication **will** take arguments, use a function that returns the JSON object.
+    An object literal specifying the configuration of the composite publication **or** a function that will
+    receive some arguments from a call to `Meteor.subscribe(...)` (much like the function argument used with
+    [`Meteor.publish`](http://docs.meteor.com/#meteor_publish)) and return an object literal. Basically,
+    if your publication will take **no** arguments, pass an object literal for this argument. If your
+    publication **will** take arguments, use a function that returns an object literal.
 
-    The JSON object should be formatted as follows:
+    The object literal should have two properties, `find` and `children`. The `find` property's value should
+    be a function that returns a cursor of your top level documents. The `children` property's value should
+    be an array containing any number of object literals with the same structure.
 
     ```javascript
     {
@@ -71,7 +74,7 @@ Arguments
     ```
 
 
-## Example
+## Examples
 
 This example illustrates a publication that takes **no** arguments.
 
@@ -79,6 +82,7 @@ This example illustrates a publication that takes **no** arguments.
 // Server
 Meteor.publishComposite('topTenPosts', {
     find: function() {
+        // Find top ten scoring posts
         return Posts.find({}, { sort: { score: -1 }, limit: 10 });
     },
     children: [
@@ -119,7 +123,9 @@ Meteor.publishComposite('postsByUser', function(userId, limit) {
             return Posts.find({ author: userId }, { limit: limit });
         },
         children: [
-            // This section will be similar to the previous example
+            // This section will be similar to the previous example. You could potentially store this
+            // array in a variable and use it for both publications (as long as they don't utilize the
+            // arguments passed to your publishComposite function param).
         ]
     }
 });
