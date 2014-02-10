@@ -76,7 +76,7 @@ Arguments
 
 ## Examples
 
-This example illustrates a publication that takes **no** arguments.
+### Example 1: a publication that takes **no** arguments.
 
 ```javascript
 // Server
@@ -88,6 +88,16 @@ Meteor.publishComposite('topTenPosts', {
     children: [
         {
             find: function(post) {
+                // Find post author. Even though we only want to return
+                // one record here, we should still use "find" instead
+                // of "findOne" since this function should return a cursor.
+                return Meteor.users.find(
+                    { _id: post.authorId },
+                    { limit: 1, fields: { profile: 1 } });
+            }
+        },
+        {
+            find: function(post) {
                 // Find top two comments on post
                 return Comments.find(
                     { postId: post._id },
@@ -96,20 +106,13 @@ Meteor.publishComposite('topTenPosts', {
             children: [
                 {
                     find: function(comment, post) {
-                        // Find user that authored comment. Even though you
-                        // only want one record, you should not use findOne
-                        // since this function should return a cursor.
+                        // Find user that authored comment.
                         return Meteor.users.find(
                             { _id: comment.authorId },
                             { limit: 1, fields: { profile: 1 } });
                     }
                 }
             ]
-        },
-        {
-            find: function(post) {
-                // Find records from another collection related to posts
-            }
         }
     ]
 });
@@ -118,8 +121,9 @@ Meteor.publishComposite('topTenPosts', {
 Meteor.subscribe('topTenPosts');
 ```
 
-This example illustrates a publication that **does** take arguments. Note a function is passed
-for the `options` argument to `Meteor.publishComposite`.
+### Example 2: a publication that **does** take arguments
+
+Note a function is passed for the `options` argument to `Meteor.publishComposite`.
 
 ```javascript
 // Server
