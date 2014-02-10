@@ -132,7 +132,7 @@ Meteor.publishComposite('postsByUser', function(userId, limit) {
         find: function() {
             // Find posts made by user. Note arguments for callback function
             // being used in query.
-            return Posts.find({ author: userId }, { limit: limit });
+            return Posts.find({ authorId: userId }, { limit: limit });
         },
         children: [
             // This section will be similar to the previous example. You could
