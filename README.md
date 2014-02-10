@@ -89,8 +89,8 @@ Meteor.publishComposite('topTenPosts', {
         {
             find: function(post) {
                 // Find post author. Even though we only want to return
-                // one record here, we should still use "find" instead
-                // of "findOne" since this function should return a cursor.
+                // one record here, we use "find" instead of "findOne"
+                // since this function should return a cursor.
                 return Meteor.users.find(
                     { _id: post.authorId },
                     { limit: 1, fields: { profile: 1 } });
@@ -119,6 +119,32 @@ Meteor.publishComposite('topTenPosts', {
 
 // Client
 Meteor.subscribe('topTenPosts');
+```
+
+Now we can use the published data in one of our templates.
+
+```javascript
+Template.myTemplate.helpers({
+    posts: function() {
+        return Posts.find();
+    },
+
+    postAuthor: function() {
+        // We use this helper inside an {{#each posts}} loop, so the context
+        // will be a post object. Thus, we can use this.authorId.
+        return Meteor.users.findOne(this.authorId);
+    }
+})
+```
+
+```handlebars
+<template name="myTemplate">
+    <ul>
+        {{#each posts}}
+            <li>{{title}} -- {{postAuthor.profile.name}}</li>
+        {{/each}}
+    </ul>
+</template>
 ```
 
 ### Example 2: a publication that **does** take arguments
