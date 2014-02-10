@@ -89,13 +89,19 @@ Meteor.publishComposite('topTenPosts', {
         {
             find: function(post) {
                 // Find top two comments on post
-                return Comments.find({ postId: post._id }, { sort: { score: -1 }, limit: 2 });
+                return Comments.find(
+                    { postId: post._id },
+                    { sort: { score: -1 }, limit: 2 });
             },
             children: [
                 {
                     find: function(comment, post) {
-                        // Find user that authored comment
-                        return Users.find({ _id: comment.authorId }, { limit: 1 });
+                        // Find user that authored comment. Even though you
+                        // only want one record, you should not use findOne
+                        // since this function should return a cursor.
+                        return Meteor.users.find(
+                            { _id: comment.authorId },
+                            { limit: 1, fields: { profile: 1 } });
                     }
                 }
             ]
@@ -112,20 +118,23 @@ Meteor.publishComposite('topTenPosts', {
 Meteor.subscribe('topTenPosts');
 ```
 
-This example illustrates a publication that **does** take arguments. Note a function is passed for the `options` argument to `Meteor.publishComposite`.
+This example illustrates a publication that **does** take arguments. Note a function is passed
+for the `options` argument to `Meteor.publishComposite`.
 
 ```javascript
 // Server
 Meteor.publishComposite('postsByUser', function(userId, limit) {
     return {
         find: function() {
-            // Find posts made by user. Note arguments for callback function being used in query.
+            // Find posts made by user. Note arguments for callback function
+            // being used in query.
             return Posts.find({ author: userId }, { limit: limit });
         },
         children: [
-            // This section will be similar to the previous example. You could potentially store this
-            // array in a variable and use it for both publications (as long as they don't utilize the
-            // arguments passed to your publishComposite function param).
+            // This section will be similar to the previous example. You could
+            // potentially store this array in a variable and use it for both
+            // publications (as long as they don't utilize the arguments
+            // passed to your publishComposite function param).
         ]
     }
 });
