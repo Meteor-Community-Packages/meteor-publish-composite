@@ -1,3 +1,6 @@
+/**
+ * Define collections used in tests
+ */
 Posts = new Meteor.Collection("posts");
 Authors = new Meteor.Collection("authors");
 Comments = new Meteor.Collection("comments");
@@ -7,11 +10,11 @@ Posts.allow({ insert: allow, update: allow, remove: allow });
 Authors.allow({ insert: allow, update: allow, remove: allow });
 Comments.allow({ insert: allow, update: allow, remove: allow });
 
-if (Meteor.isServer) {
-    Meteor.startup(function() {
-        Future = Npm.require('fibers/future');
-    });
 
+/**
+ * Set up publications for testing
+ */
+if (Meteor.isServer) {
     var postPublicationChildren = [
             {
                 find: function(post) {
@@ -49,9 +52,13 @@ if (Meteor.isServer) {
     });
 }
 
+
+/**
+ * Define tests
+ */
 if (Meteor.isClient) {
     Tinytest.addAsync("Should publish all posts", function(test, onComplete) {
-        Meteor.call("initData");
+        Meteor.call("initTestData");
 
         var subscription = Meteor.subscribe("allPosts", function() {
             var posts = Posts.find();
@@ -63,7 +70,7 @@ if (Meteor.isClient) {
     });
 
     Tinytest.addAsync("Should publish all post authors", function(test, onComplete) {
-        Meteor.call("initData");
+        Meteor.call("initTestData");
         
         var subscription = Meteor.subscribe("allPosts", function() {
             var posts = Posts.find();
@@ -79,7 +86,7 @@ if (Meteor.isClient) {
     });
 
     Tinytest.addAsync("Should publish all post comments", function(test, onComplete) {
-        Meteor.call("initData");
+        Meteor.call("initTestData");
         
         var subscription = Meteor.subscribe("allPosts", function() {
             var comments = Comments.find();
@@ -91,7 +98,7 @@ if (Meteor.isClient) {
     });
 
     Tinytest.addAsync("Should publish all post comment authors", function(test, onComplete) {
-        Meteor.call("initData");
+        Meteor.call("initTestData");
         
         var subscription = Meteor.subscribe("allPosts", function() {
             var comments = Comments.find();
@@ -106,8 +113,23 @@ if (Meteor.isClient) {
         });
     });
 
+    Tinytest.addAsync("Should publish one user's posts", function(test, onComplete) {
+        Meteor.call("initTestData");
+        
+        var subscription = Meteor.subscribe("userPosts", "marie", function() {
+            var allSubscribedPosts = Posts.find();
+            test.equal(allSubscribedPosts.count(), 2, "Post count");
+
+            var postsByOtherAuthors = Posts.find({ author: { $ne: "marie" } });
+            test.equal(postsByOtherAuthors.count(), 0, "Post count");
+
+            subscription.stop();
+            onComplete();
+        });
+    });
+
     Tinytest.addAsync("Should remove author when comment is deleted", function(test, onComplete) {
-        Meteor.call("initData");
+        Meteor.call("initTestData");
         
         var subscription = Meteor.subscribe("userPosts", "marie", function() {
             var mariesSecondPost = Posts.findOne({ title: "Marie's second post" });
@@ -127,7 +149,7 @@ if (Meteor.isClient) {
     });
 
     Tinytest.addAsync("Should not remove author when comment is deleted if author record still needed", function(test, onComplete) {
-        Meteor.call("initData");
+        Meteor.call("initTestData");
         
         var subscription = Meteor.subscribe("userPosts", "marie", function() {
             var mariesSecondPost = Posts.findOne({ title: "Marie's second post" });
@@ -145,28 +167,15 @@ if (Meteor.isClient) {
             });
         });
     });
-
-    Tinytest.addAsync("Should publish one user's posts", function(test, onComplete) {
-        Meteor.call("initData");
-        
-        var subscription = Meteor.subscribe("userPosts", "marie", function() {
-            var posts = Posts.find();
-            test.equal(posts.count(), 2, "Post count");
-
-            var authors = Authors.find();
-            test.equal(authors.count(), 4, "Author count");
-
-            subscription.stop();
-            onComplete();
-        });
-    });
 }
 
 
-// Util functions
+/**
+ * Utility methods
+ */
 if (Meteor.isServer) {
     Meteor.methods({
-        initData: (function() {
+        initTestData: (function() {
             return function() {
                 removeAllData();
                 initUsers();
