@@ -8,7 +8,15 @@ Meteor.publishComposite = function(name, options) {
             instanceOptions = instanceOptions.apply(subscription, args);
         }
 
-        var pub = new Pub(subscription, instanceOptions);
+        var refCounter = new DocumentRefCounter({
+            onChange: function(collectionName, doc, refCount) {
+                if (refCount <= 0) {
+                    subscription.removed(collectionName, doc._id);
+                }
+            }
+        });
+        var pub = new Pub(subscription, instanceOptions, refCounter);
+        pub.publish();
 
         subscription.onStop(function() {
             pub.unpublish();
@@ -19,55 +27,94 @@ Meteor.publishComposite = function(name, options) {
 };
 
 
-var Pub = function(subscription, options, args) {
+var Pub = function(subscription, options, refCounter, args) {
     this.subscription = subscription;
     this.options = options;
+    this.refCounter = refCounter;
     this.args = args || [];
     this.children = options.children || [];
     this.childPublications = [];
+};
 
-    this._startPublishing();
+Pub.prototype.publish = function() {
+    this.cursor = this.options.find.apply(this.subscription, this.args);
+
+    if (!this.cursor) { return; }
+
+    this.collectionName = this.cursor._getCollectionName();
+    var self = this;
+
+    this.observeHandle = this.cursor.observe({
+        added: function(doc) {
+            self.refCounter.increment(self.collectionName, doc);
+            self.subscription.added(self.collectionName, doc._id, doc);
+            self._publishChildrenOf(doc);
+        },
+        changed: function(doc) {
+            self.subscription.changed(self.collectionName, doc._id, doc);
+        },
+        removed: function(doc) {
+            self._unpublishChildrenOf(doc);
+            self.refCounter.decrement(self.collectionName, doc);
+        }
+    });
 };
 
 Pub.prototype.unpublish = function() {
-    this.observeHandle && this.observeHandle.stop();
+    this.observeHandle.stop();
+
+    this._dereferenceAllCursorDocuments();
+    this._unpublishChildPublications();
+};
+
+Pub.prototype._publishChildrenOf = function(doc) {
+    _.each(this.children, function(options) {
+        var pub = new Pub(this.subscription, options, this.refCounter, [ doc ].concat(this.args));
+        this.childPublications[doc._id] = pub;
+        pub.publish();
+    }, this);
+};
+
+Pub.prototype._unpublishChildrenOf = function(doc) {
+    if (this.childPublications[doc._id]) {
+        this.childPublications[doc._id].unpublish();
+    }
+    delete this.childPublications[doc._id];
+};
+
+Pub.prototype._dereferenceAllCursorDocuments = function() {
+    this.cursor.rewind();
+    this.cursor.forEach(function(doc) {
+        this.refCounter.decrement(this.collectionName, doc);
+    }, this);
+};
+
+Pub.prototype._unpublishChildPublications = function() {
     for (var i in this.childPublications) {
         this.childPublications[i].unpublish();
         delete this.childPublications[i];
     }
 };
 
-Pub.prototype._startPublishing = function() {
-    var cursor = this.options.find.apply(this.subscription, this.args);
 
-    if (!cursor) { return; }
-
-    var collectionName = cursor._getCollectionName();
-    var self = this;
-
-    this.observeHandle = cursor.observe({
-        added: function(doc) {
-            self.subscription.added(collectionName, doc._id, doc);
-            self._publishChildrenOf(doc);
-        },
-        changed: function(doc) {
-            self.subscription.changed(collectionName, doc._id, doc);
-        },
-        removed: function(doc) {
-            self._unpublishChildrenOf(doc);
-            self.subscription.removed(collectionName, doc._id);
-        }
-    });
+var DocumentRefCounter = function(observer) {
+    this.heap = {};
+    this.observer = observer;
 };
 
-Pub.prototype._publishChildrenOf = function(doc) {
-    _.each(this.children, function(options) {
-        var pub = new Pub(this.subscription, options, [ doc ].concat(this.args));
-        this.childPublications[doc._id] = pub;
-    }, this);
+DocumentRefCounter.prototype.increment = function(collectionName, doc) {
+    var key = collectionName + ":" + doc._id;
+    if (!this.heap[key]) {
+        this.heap[key] = 0;
+    }
+    this.heap[key]++;
 };
 
-Pub.prototype._unpublishChildrenOf = function(doc) {
-    this.childPublications[doc._id] && this.childPublications[doc._id].unpublish();
-    delete this.childPublications[doc._id];
+DocumentRefCounter.prototype.decrement = function(collectionName, doc) {
+    var key = collectionName + ":" + doc._id;
+    if (this.heap[key]) {
+        this.heap[key]--;
+
+        this.observer.onChange(collectionName, doc, this.heap[key]);
+    }
 };

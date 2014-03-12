@@ -1,20 +1,21 @@
-Posts = new Meteor.Collection('posts');
-Authors = new Meteor.Collection('authors');
-Comments = new Meteor.Collection('comments');
+Posts = new Meteor.Collection("posts");
+Authors = new Meteor.Collection("authors");
+Comments = new Meteor.Collection("comments");
+
+var allow = function() { return true; };
+Posts.allow({ insert: allow, update: allow, remove: allow });
+Authors.allow({ insert: allow, update: allow, remove: allow });
+Comments.allow({ insert: allow, update: allow, remove: allow });
 
 if (Meteor.isServer) {
-    Meteor.startup(function () {
-        initData();
+    Meteor.startup(function() {
+        Future = Npm.require('fibers/future');
     });
 
-    Meteor.publishComposite('allPosts', {
-        find: function() {
-            return Posts.find();
-        },
-        children: [
+    var postPublicationChildren = [
             {
                 find: function(post) {
-                    return Authors.find({ _id: post.authorId });
+                    return Authors.find({ username: post.author });
                 }
             },
             {
@@ -24,130 +25,212 @@ if (Meteor.isServer) {
                 children: [
                     {
                         find: function(comment) {
-                            return Authors.find({ _id: comment.authorId });
+                            return Authors.find({ username: comment.author });
                         }
                     }
                 ]
             }
-        ]
+        ];
+
+    Meteor.publishComposite("allPosts", {
+        find: function() {
+            return Posts.find();
+        },
+        children: postPublicationChildren
     });
 
     Meteor.publishComposite("userPosts", function(username) {
         return {
             find: function() {
-                var user = Authors.findOne({ username: username });
-                return Posts.find({ authorId: user._id });
+                return Posts.find({ author: username });
             },
-            children: [
-                {
-                    find: function(post) {
-                        return Authors.find({ _id: post.authorId }, { fields: { profile: 1 } });
-                    }
-                }
-            ]
+            children: postPublicationChildren
         }
     });
 }
 
 if (Meteor.isClient) {
-    testAsyncMulti("Should publish all posts and authors", [function(test, expect) {
-        var subscription = Meteor.subscribe('allPosts', expect(function() {
+    Tinytest.addAsync("Should publish all posts", function(test, onComplete) {
+        Meteor.call("initData");
+
+        var subscription = Meteor.subscribe("allPosts", function() {
             var posts = Posts.find();
             test.equal(posts.count(), 3, "Post count");
 
-            var authors = Authors.find();
-            test.equal(authors.count(), 4, "Author count");
+            subscription.stop();
+            onComplete();
+        });
+    });
 
-            var comments = Comments.find();
-            test.equal(comments.count(), 4, "Comment count");
+    Tinytest.addAsync("Should publish all post authors", function(test, onComplete) {
+        Meteor.call("initData");
+        
+        var subscription = Meteor.subscribe("allPosts", function() {
+            var posts = Posts.find();
+
+            posts.forEach(function(post) {
+                var author = Authors.findOne({ username: post.author });
+                test.isTrue(typeof author !== "undefined", "Post author");
+            });
 
             subscription.stop();
-        }));
-    }]);
+            onComplete();
+        });
+    });
 
-    testAsyncMulti("Should publish one user's posts", [function(test, expect) {
-        var subscription = Meteor.subscribe('userPosts', 'marie', expect(function() {
+    Tinytest.addAsync("Should publish all post comments", function(test, onComplete) {
+        Meteor.call("initData");
+        
+        var subscription = Meteor.subscribe("allPosts", function() {
+            var comments = Comments.find();
+            test.equal(comments.count(), 5, "Comment count");
+
+            subscription.stop();
+            onComplete();
+        });
+    });
+
+    Tinytest.addAsync("Should publish all post comment authors", function(test, onComplete) {
+        Meteor.call("initData");
+        
+        var subscription = Meteor.subscribe("allPosts", function() {
+            var comments = Comments.find();
+
+            comments.forEach(function(comment) {
+                var author = Authors.findOne({ username: comment.author });
+                test.isTrue(typeof author !== "undefined", "Comment author");
+            });
+
+            subscription.stop();
+            onComplete();
+        });
+    });
+
+    Tinytest.addAsync("Should remove author when comment is deleted", function(test, onComplete) {
+        Meteor.call("initData");
+        
+        var subscription = Meteor.subscribe("userPosts", "marie", function() {
+            var mariesSecondPost = Posts.findOne({ title: "Marie's second post" });
+
+            test.equal(Authors.find({ "username": "richard" }).count(), 1, "Author present pre-delete");
+
+            var comment = Comments.findOne({ postId: mariesSecondPost._id, text: "Richard's comment" });
+            Meteor.call("removeComment", comment._id, function(err) {
+                test.isUndefined(err);
+
+                test.equal(Authors.find({ "username": "richard" }).count(), 0, "Author absent post-delete");
+
+                subscription.stop();
+                onComplete();
+            });
+        });
+    });
+
+    Tinytest.addAsync("Should not remove author when comment is deleted if author record still needed", function(test, onComplete) {
+        Meteor.call("initData");
+        
+        var subscription = Meteor.subscribe("userPosts", "marie", function() {
+            var mariesSecondPost = Posts.findOne({ title: "Marie's second post" });
+
+            test.equal(Authors.find({ "username": "marie" }).count(), 1, "Author present pre-delete");
+
+            var comment = Comments.findOne({ postId: mariesSecondPost._id, text: "Marie's comment" });
+            Meteor.call("removeComment", comment._id, function(err) {
+                test.isUndefined(err);
+
+                test.equal(Authors.find({ "username": "marie" }).count(), 1, "Author still present post-delete");
+
+                subscription.stop();
+                onComplete();
+            });
+        });
+    });
+
+    Tinytest.addAsync("Should publish one user's posts", function(test, onComplete) {
+        Meteor.call("initData");
+        
+        var subscription = Meteor.subscribe("userPosts", "marie", function() {
             var posts = Posts.find();
             test.equal(posts.count(), 2, "Post count");
 
             var authors = Authors.find();
-            test.equal(authors.count(), 1, "Author count");
+            test.equal(authors.count(), 4, "Author count");
 
             subscription.stop();
-        }));
-    }]);
+            onComplete();
+        });
+    });
 }
 
 
 // Util functions
-var initData = (function() {
-    return function() {
-        removeAllData();
-        initUsers();
-        initPosts();
-    };
+if (Meteor.isServer) {
+    Meteor.methods({
+        initData: (function() {
+            return function() {
+                removeAllData();
+                initUsers();
+                initPosts();
+            };
 
-    function removeAllData() {
-        Comments.remove();
-        Posts.remove();
-        Authors.remove();
-    }
+            function removeAllData() {
+                Comments.remove({});
+                Posts.remove({});
+                Authors.remove({});
+            }
 
-    function initUsers() {
-        if (Authors.find().count() <= 0) {
-            console.log('no users found, adding some');
+            function initUsers() {
+                Authors.insert({ username: "marie" });
+                Authors.insert({ username: "albert" });
+                Authors.insert({ username: "richard" });
+                Authors.insert({ username: "stephen" });
+                Authors.insert({ username: "john" });
+            }
 
-            Authors.insert({ username: 'marie' });
-            Authors.insert({ username: 'albert' });
-            Authors.insert({ username: 'richard' });
-            Authors.insert({ username: 'stephen' });
-            Authors.insert({ username: 'john' });
-        }
-    };
+            function initPosts() {
+                insertPost("Marie's first post", "marie", [{
+                    text: "Comment text",
+                    author: "albert"
+                }]);
 
-    function initPosts() {
-        if (Posts.find().count() <= 0) {
-            console.log('no posts found, adding some');
+                insertPost("Marie's second post", "marie", [
+                    {
+                        text: "Richard's comment",
+                        author: "richard"
+                    },
+                    {
+                        text: "Stephen's comment",
+                        author: "stephen"
+                    },
+                    {
+                        text: "Marie's comment",
+                        author: "marie"
+                    }
+                ]);
 
-            var marie = Authors.findOne({ username: 'marie' });
-            var albert = Authors.findOne({ username: 'albert' });
-            var richard = Authors.findOne({ username: 'richard' });
-            var stephen = Authors.findOne({ username: 'stephen' });
+                insertPost("Albert's first post", "albert", [{
+                    text: "Comment text",
+                    author: "richard"
+                }]);
+            }
 
-            insertPost('Marie\'s first post', marie._id, [{
-                text: "Comment text",
-                authorId: albert._id
-            }]);
+            function insertPost(title, author, comments) {
+                var postId = Posts.insert({
+                    title: title,
+                    author: author
+                });
 
-            insertPost('Marie\'s second post', marie._id, [
-                {
-                    text: "Comment one",
-                    authorId: richard._id
-                },
-                {
-                    text: "Comment two",
-                    authorId: stephen._id
+                var commentData;
+                for (var i = 0; i < comments.length; i++) {
+                    commentData = _.extend({}, comments[i], { postId: postId });
+
+                    Comments.insert(commentData);
                 }
-            ]);
+            }
+        }()),
 
-            insertPost('Albert\'s first post', albert._id, [{
-                text: "Comment text",
-                authorId: richard._id
-            }]);
+        removeComment: function(commentId) {
+            var count = Comments.remove(commentId);
         }
-    };
-
-    function insertPost(title, authorId, comments) {
-        var postId = Posts.insert({
-            title: title,
-            authorId: authorId
-        });
-
-        var commentData;
-        for (var i = 0; i < comments.length; i++) {
-            commentData = _.extend({}, comments[i], { postId: postId });
-
-            Comments.insert(commentData);
-        }
-    };
-}());
+    });
+}
