@@ -54,118 +54,182 @@ if (Meteor.isServer) {
 
 
 /**
+ * Define test helper
+ */
+var testPublication = function(testName, options) {
+    options.args = options.args || [];
+
+    Tinytest.addAsync(testName, function(assert, onComplete) {
+        var subscription;
+        var args = [ options.publication ].concat(options.args);
+
+        args.push(function onSubscriptionReady() {
+            options.testHandler(assert, function() {
+                subscription.stop();
+                onComplete();
+            });
+        });
+
+        Meteor.call("initTestData");
+
+        subscription = Meteor.subscribe.apply(Meteor, args);
+    });
+};
+
+
+/**
  * Define tests
  */
 if (Meteor.isClient) {
-    Tinytest.addAsync("Should publish all posts", function(test, onComplete) {
-        Meteor.call("initTestData");
+    testPublication("Should publish all posts", {
+        publication: "allPosts",
 
-        var subscription = Meteor.subscribe("allPosts", function() {
+        testHandler: function(assert, onComplete) {
             var posts = Posts.find();
-            test.equal(posts.count(), 3, "Post count");
+            assert.equal(posts.count(), 4, "Post count");
 
-            subscription.stop();
             onComplete();
-        });
+        }
     });
 
-    Tinytest.addAsync("Should publish all post authors", function(test, onComplete) {
-        Meteor.call("initTestData");
-        
-        var subscription = Meteor.subscribe("allPosts", function() {
+    testPublication("Should publish all post authors", {
+        publication: "allPosts",
+
+        testHandler: function(assert, onComplete) {
             var posts = Posts.find();
 
             posts.forEach(function(post) {
                 var author = Authors.findOne({ username: post.author });
-                test.isTrue(typeof author !== "undefined", "Post author");
+                assert.isTrue(typeof author !== "undefined", "Post author");
             });
 
-            subscription.stop();
             onComplete();
-        });
+        }
     });
 
-    Tinytest.addAsync("Should publish all post comments", function(test, onComplete) {
-        Meteor.call("initTestData");
-        
-        var subscription = Meteor.subscribe("allPosts", function() {
+    testPublication("Should publish all post comments", {
+        publication: "allPosts",
+
+        testHandler: function(assert, onComplete) {
             var comments = Comments.find();
-            test.equal(comments.count(), 5, "Comment count");
+            assert.equal(comments.count(), 5, "Comment count");
 
-            subscription.stop();
             onComplete();
-        });
+        }
     });
 
-    Tinytest.addAsync("Should publish all post comment authors", function(test, onComplete) {
-        Meteor.call("initTestData");
-        
-        var subscription = Meteor.subscribe("allPosts", function() {
+    testPublication("Should publish all post comment authors", {
+        publication: "allPosts",
+
+        testHandler: function(assert, onComplete) {
             var comments = Comments.find();
 
             comments.forEach(function(comment) {
                 var author = Authors.findOne({ username: comment.author });
-                test.isTrue(typeof author !== "undefined", "Comment author");
+                assert.isTrue(typeof author !== "undefined", "Comment author");
             });
 
-            subscription.stop();
             onComplete();
-        });
+        }
     });
 
-    Tinytest.addAsync("Should publish one user's posts", function(test, onComplete) {
-        Meteor.call("initTestData");
-        
-        var subscription = Meteor.subscribe("userPosts", "marie", function() {
+    testPublication("Should publish one user's posts", {
+        publication: "userPosts",
+        args: [ "marie" ],
+
+        testHandler: function(assert, onComplete) {
             var allSubscribedPosts = Posts.find();
-            test.equal(allSubscribedPosts.count(), 2, "Post count");
+            assert.equal(allSubscribedPosts.count(), 2, "Post count");
 
             var postsByOtherAuthors = Posts.find({ author: { $ne: "marie" } });
-            test.equal(postsByOtherAuthors.count(), 0, "Post count");
+            assert.equal(postsByOtherAuthors.count(), 0, "Post count");
 
-            subscription.stop();
             onComplete();
-        });
+        }
     });
 
-    Tinytest.addAsync("Should remove author when comment is deleted", function(test, onComplete) {
-        Meteor.call("initTestData");
-        
-        var subscription = Meteor.subscribe("userPosts", "marie", function() {
+    testPublication("Should remove author when comment is deleted", {
+        publication: "userPosts",
+        args: [ "marie" ],
+
+        testHandler: function(assert, onComplete) {
             var mariesSecondPost = Posts.findOne({ title: "Marie's second post" });
 
-            test.equal(Authors.find({ "username": "richard" }).count(), 1, "Author present pre-delete");
+            assert.equal(Authors.find({ "username": "richard" }).count(), 1, "Author present pre-delete");
 
             var comment = Comments.findOne({ postId: mariesSecondPost._id, text: "Richard's comment" });
+
             Meteor.call("removeComment", comment._id, function(err) {
-                test.isUndefined(err);
+                assert.isUndefined(err);
 
-                test.equal(Authors.find({ "username": "richard" }).count(), 0, "Author absent post-delete");
+                assert.equal(Authors.find({ "username": "richard" }).count(), 0, "Author absent post-delete");
 
-                subscription.stop();
                 onComplete();
             });
-        });
+        }
     });
 
-    Tinytest.addAsync("Should not remove author when comment is deleted if author record still needed", function(test, onComplete) {
-        Meteor.call("initTestData");
-        
-        var subscription = Meteor.subscribe("userPosts", "marie", function() {
+    testPublication("Should not remove author when comment is deleted if author record still needed", {
+        publication: "userPosts",
+        args: [ "marie" ],
+
+        testHandler: function(assert, onComplete) {
             var mariesSecondPost = Posts.findOne({ title: "Marie's second post" });
 
-            test.equal(Authors.find({ "username": "marie" }).count(), 1, "Author present pre-delete");
+            assert.equal(Authors.find({ "username": "marie" }).count(), 1, "Author present pre-delete");
 
             var comment = Comments.findOne({ postId: mariesSecondPost._id, text: "Marie's comment" });
+
             Meteor.call("removeComment", comment._id, function(err) {
-                test.isUndefined(err);
+                assert.isUndefined(err);
 
-                test.equal(Authors.find({ "username": "marie" }).count(), 1, "Author still present post-delete");
+                assert.equal(Authors.find({ "username": "marie" }).count(), 1, "Author still present post-delete");
 
-                subscription.stop();
                 onComplete();
             });
-        });
+        }
+    });
+
+    testPublication("Should remove both post and author if post author is changed", {
+        publication: "userPosts",
+        args: [ "stephen" ],
+
+        testHandler: function(assert, onComplete) {
+            var post = Posts.findOne({ title: "Post with no comments" });
+
+            assert.isTrue(typeof post !== "undefined" , "Post present pre-change");
+            assert.equal(Authors.find({ "username": "stephen" }).count(), 1, "Author present pre-change");
+
+            Meteor.call("updatePostAuthor", post._id, "marie", function(err) {
+                assert.isUndefined(err);
+
+                assert.equal(Posts.find().count(), 0, "Post absent post-change");
+                assert.equal(Authors.find().count(), 0, "Author absent post-change");
+
+                onComplete();
+            });
+        }
+    });
+
+    testPublication("Should publish new author and remove old if comment author is changed", {
+        publication: "userPosts",
+        args: [ "albert" ],
+
+        testHandler: function(assert, onComplete) {
+            var comment = Comments.findOne({ author: "richard" });
+
+            assert.equal(Authors.find({ "username": "richard" }).count(), 1, "Old author present pre-change");
+            assert.equal(Authors.find({ "username": "marie" }).count(), 0, "New author absent pre-change");
+
+            Meteor.call("updateCommentAuthor", comment._id, "marie", function(err) {
+                assert.isUndefined(err);
+
+                assert.equal(Authors.find({ "username": "richard" }).count(), 0, "Old author absent post-change");
+                assert.equal(Authors.find({ "username": "marie" }).count(), 1, "New author present post-change");
+
+                onComplete();
+            });
+        }
     });
 }
 
@@ -217,10 +281,12 @@ if (Meteor.isServer) {
                     }
                 ]);
 
-                insertPost("Albert's first post", "albert", [{
+                insertPost("Post with one comment", "albert", [{
                     text: "Comment text",
                     author: "richard"
                 }]);
+
+                insertPost("Post with no comments", "stephen");
             }
 
             function insertPost(title, author, comments) {
@@ -229,17 +295,26 @@ if (Meteor.isServer) {
                     author: author
                 });
 
-                var commentData;
-                for (var i = 0; i < comments.length; i++) {
-                    commentData = _.extend({}, comments[i], { postId: postId });
+                if (comments) {
+                    for (var i = 0; i < comments.length; i++) {
+                        var commentData = _.extend({}, comments[i], { postId: postId });
 
-                    Comments.insert(commentData);
+                        Comments.insert(commentData);
+                    }
                 }
             }
         }()),
 
         removeComment: function(commentId) {
             var count = Comments.remove(commentId);
+        },
+
+        updatePostAuthor: function(postId, newAuthor) {
+            Posts.update({ _id: postId }, { $set: { author: newAuthor } });
+        },
+
+        updateCommentAuthor: function(commentId, newAuthor) {
+            Comments.update({ _id: commentId }, { $set: { author: newAuthor } });
         }
     });
 }
