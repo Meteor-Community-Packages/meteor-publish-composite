@@ -3,7 +3,7 @@
     "description": "Meteor.publishComposite provides a flexible way to publish a set of documents and their child documents in one go. In this way, a whole tree of documents can be published.",
     "homepage": "https://github.com/reywood/meteor-publish-composite",
     "author": "Sean Dwyer",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "git": "https://github.com/reywood/meteor-publish-composite.git",
     "packages": {
     }
