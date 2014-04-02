@@ -1,8 +1,9 @@
 meteor-publish-composite
 ========================
 
-Meteor.publishComposite provides a flexible way to publish a set of documents and their
-child documents in one go. In this way, a whole tree of documents can be published.
+`Meteor.publishComposite(...)` provides a flexible way to publish a set of documents and their
+child documents all at once. This allows a whole tree of documents to be published. The published
+collections are reactive and will update when additions/changes/deletions are made.
 
 ## Installation
 
@@ -13,9 +14,9 @@ $ mrt add publish-composite
 
 ## Usage
 
-This package defines one new Meteor function:
+This package defines one new Meteor function on the server:
 
-#### Meteor.publishComposite(name, options) -- *Server*
+#### Meteor.publishComposite(name, options)
 
 Arguments
 
@@ -25,27 +26,28 @@ Arguments
 
 * **options** -- *object literal or callback function*
 
-    An object literal specifying the configuration of the composite publication **or** a function that will
-    receive some arguments from a call to `Meteor.subscribe(...)` (much like the function argument used with
-    [`Meteor.publish`](http://docs.meteor.com/#meteor_publish)) and return an object literal. Basically,
-    if your publication will take **no** arguments, pass an object literal for this argument. If your
-    publication **will** take arguments, use a function that returns an object literal.
+    An object literal specifying the configuration of the composite publication **or** a function that
+    returns said object literal. If a function is used, it will receive the arguments passed to
+    `Meteor.subscribe('myPub', arg1, arg2, ...)` (much like the `func` argument of
+    [`Meteor.publish`](http://docs.meteor.com/#meteor_publish)). Basically, if your publication will
+    take **no** arguments, pass an object literal for this argument. If your publication **will** take
+    arguments, use a function that returns an object literal.
 
-    The object literal should have two properties, `find` and `children`. The `find` property's value should
-    be a function that returns a cursor of your top level documents. The `children` property's value should
-    be an array containing any number of object literals with the same structure.
+    The object literal should have two properties, `find` and `children`. The `find` property's value must
+    be a function that returns a **cursor** of your top level documents. The `children` property's value should
+    be an array containing any number of object literals with this same structure.
 
     ```javascript
     {
         find: function() {
-            // Should return a cursor containing top level documents
+            // Must return a cursor containing top level documents
         },
         children: [
             {
                 find: function(topLevelDocument) {
                     // Called for each top level document. Top level document is passed
                     // in as an argument.
-                    // Should return a cursor of second tier documents.
+                    // Must return a cursor of second tier documents.
                 },
                 children: [
                     {
@@ -54,7 +56,7 @@ Arguments
                             // will receive all parent documents starting with the nearest
                             // parent and working all the way up to the top level as
                             // arguments.
-                            // Should return a cursor of third tier documents.
+                            // Must return a cursor of third tier documents.
                         },
                         children: [
                            // Repeat as many levels deep as you like
@@ -65,7 +67,7 @@ Arguments
             {
                 find: function(topLevelDocument) {
                     // Also called for each top level document.
-                    // Should return another cursor of second tier documents.
+                    // Must return another cursor of second tier documents.
                 }
                 // The children property is optional at every level.
             }
@@ -76,7 +78,9 @@ Arguments
 
 ## Examples
 
-### Example 1: a publication that takes **no** arguments.
+### Example 1: A publication that takes **no** arguments.
+
+First, we'll create our publication on the server.
 
 ```javascript
 // Server
@@ -116,29 +120,20 @@ Meteor.publishComposite('topTenPosts', {
         }
     ]
 });
+```
 
+Next, we subscribe to our publication on the client.
+
+```javascript
 // Client
 Meteor.subscribe('topTenPosts');
 ```
 
 Now we can use the published data in one of our templates.
 
-```javascript
-Template.myTemplate.helpers({
-    posts: function() {
-        return Posts.find();
-    },
-
-    postAuthor: function() {
-        // We use this helper inside an {{#each posts}} loop, so the context
-        // will be a post object. Thus, we can use this.authorId.
-        return Meteor.users.findOne(this.authorId);
-    }
-})
-```
-
 ```handlebars
-<template name="myTemplate">
+<template name="topTenPosts">
+    <h1>Top Ten Posts</h1>
     <ul>
         {{#each posts}}
             <li>{{title}} -- {{postAuthor.profile.name}}</li>
@@ -147,7 +142,21 @@ Template.myTemplate.helpers({
 </template>
 ```
 
-### Example 2: a publication that **does** take arguments
+```javascript
+Template.topTenPosts.helpers({
+    posts: function() {
+        return Posts.find();
+    },
+
+    postAuthor: function() {
+        // We use this helper inside the {{#each posts}} loop, so the context
+        // will be a post object. Thus, we can use this.authorId.
+        return Meteor.users.findOne(this.authorId);
+    }
+})
+```
+
+### Example 2: A publication that **does** take arguments
 
 Note a function is passed for the `options` argument to `Meteor.publishComposite`.
 
@@ -161,14 +170,13 @@ Meteor.publishComposite('postsByUser', function(userId, limit) {
             return Posts.find({ authorId: userId }, { limit: limit });
         },
         children: [
-            // This section will be similar to the previous example. You could
-            // potentially store this array in a variable and use it for both
-            // publications (as long as they don't utilize the arguments
-            // passed to your publishComposite function param).
+            // This section will be similar to that of the previous example.
         ]
     }
 });
+```
 
+```javascript
 // Client
 var userId = 1, limit = 10;
 Meteor.subscribe('postsByUser', userId, limit);
