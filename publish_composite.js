@@ -55,7 +55,7 @@ var Publication = function(subscription, options, args) {
 };
 
 Publication.prototype.publish = function() {
-    this.cursor = this.options.find.apply(this.subscription, this.args);
+    this.cursor = this.options.find.apply(this.subscription.meteorSub, this.args);
 
     if (!this.cursor) { return; }
 
