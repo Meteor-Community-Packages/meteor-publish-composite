@@ -80,7 +80,9 @@ Publication.prototype.publish = function() {
 };
 
 Publication.prototype.unpublish = function() {
-    this.observeHandle.stop();
+    if (this.observeHandle) {
+        this.observeHandle.stop();
+    }
 
     this._removeAllCursorDocuments();
     this._unpublishChildPublications();
@@ -106,6 +108,8 @@ Publication.prototype._unpublishChildrenOf = function(docId) {
 };
 
 Publication.prototype._removeAllCursorDocuments = function() {
+    if (!this.cursor) { return; }
+    
     this.cursor.rewind();
     this.cursor.forEach(function(doc) {
         this.subscription.removed(this.collectionName, doc);
