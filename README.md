@@ -20,11 +20,11 @@ This package defines one new Meteor function on the server:
 
 Arguments
 
-* **name** -- *string*
+* **`name`** -- *string*
 
     The name of the publication
 
-* **options** -- *object literal or callback function*
+* **`options`** -- *object literal or callback function*
 
     An object literal specifying the configuration of the composite publication **or** a function that
     returns said object literal. If a function is used, it will receive the arguments passed to
