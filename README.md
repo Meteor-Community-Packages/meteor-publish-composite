@@ -5,6 +5,8 @@ meteor-publish-composite
 child documents all at once. This allows a whole tree of documents to be published. The published
 collections are reactive and will update when additions/changes/deletions are made.
 
+This project differs from many other parent/child relationship mappers in its flexibility. The relationship between a parent and its children can be based on almost anything. For example, let's say you have a site that displays news articles. On each article page, you would like to display a list at the end containing a couple of related articles. You could use `publishComposite` to publish the primary article, scan the body for keywords which are then used to search for other articles, and publish these related articles as children. Of course, the keyword extraction and searching are up to you to implement.
+
 ## Installation
 
 ```sh
@@ -86,7 +88,7 @@ First, we'll create our publication on the server.
 // Server
 Meteor.publishComposite('topTenPosts', {
     find: function() {
-        // Find top ten scoring posts
+        // Find top ten highest scoring posts
         return Posts.find({}, { sort: { score: -1 }, limit: 10 });
     },
     children: [
