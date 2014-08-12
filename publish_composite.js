@@ -203,7 +203,7 @@ DocumentRefCounter.prototype.decrement = function(collectionName, docId) {
 };
 
 
-var enableDebugLogging = true;
+var enableDebugLogging = false;
 var debugLog = enableDebugLogging ? function(source, message) {
     while (source.length < 35) { source += " "; }
     console.log("[" + source + "] " + message);
