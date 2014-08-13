@@ -16,24 +16,24 @@ Comments.allow({ insert: allow, update: allow, remove: allow });
  */
 if (Meteor.isServer) {
     var postPublicationChildren = [
-            {
-                find: function(post) {
-                    return Authors.find({ username: post.author });
-                }
-            },
-            {
-                find: function(post) {
-                    return Comments.find({ postId: post._id });
-                },
-                children: [
-                    {
-                        find: function(comment) {
-                            return Authors.find({ username: comment.author });
-                        }
-                    }
-                ]
+        {
+            find: function(post) {
+                return Authors.find({ username: post.author });
             }
-        ];
+        },
+        {
+            find: function(post) {
+                return Comments.find({ postId: post._id });
+            },
+            children: [
+                {
+                    find: function(comment) {
+                        return Authors.find({ username: comment.author });
+                    }
+                }
+            ]
+        }
+    ];
 
     Meteor.publishComposite("allPosts", {
         find: function() {
@@ -45,6 +45,7 @@ if (Meteor.isServer) {
     Meteor.publishComposite("userPosts", function(username) {
         return {
             find: function() {
+                console.log("userPosts.find() called");
                 return Posts.find({ author: username });
             },
             children: postPublicationChildren
@@ -64,15 +65,23 @@ var testPublication = function(testName, options) {
         var args = [ options.publication ].concat(options.args);
 
         args.push(function onSubscriptionReady() {
-            options.testHandler(assert, function() {
-                subscription.stop();
-                onComplete();
+            Meteor.call("log", "Sub ready, starting test", function() {
+                options.testHandler(assert, function() {
+                    Meteor.call("log", "stopping sub", function() {
+                        subscription.stop();
+                        Meteor.call("log", "test complete", function() {
+                            onComplete();
+                        });
+                    });
+                });
             });
         });
 
         Meteor.call("initTestData");
 
-        subscription = Meteor.subscribe.apply(Meteor, args);
+        Meteor.call("log", "** " + testName + ": Subscribing", function() {
+            subscription = Meteor.subscribe.apply(Meteor, args);
+        });
     });
 };
 
@@ -157,9 +166,9 @@ if (Meteor.isClient) {
 
             assert.equal(Authors.find({ "username": "richard" }).count(), 1, "Author present pre-delete");
 
-            var comment = Comments.findOne({ postId: mariesSecondPost._id, text: "Richard's comment" });
+            var richardsComment = Comments.findOne({ postId: mariesSecondPost._id, author: "richard" });
 
-            Meteor.call("removeComment", comment._id, function(err) {
+            Meteor.call("removeComment", richardsComment._id, function(err) {
                 assert.isUndefined(err);
 
                 assert.equal(Authors.find({ "username": "richard" }).count(), 0, "Author absent post-delete");
@@ -178,9 +187,9 @@ if (Meteor.isClient) {
 
             assert.equal(Authors.find({ "username": "marie" }).count(), 1, "Author present pre-delete");
 
-            var comment = Comments.findOne({ postId: mariesSecondPost._id, text: "Marie's comment" });
+            var mariesComment = Comments.findOne({ postId: mariesSecondPost._id, author: "marie" });
 
-            Meteor.call("removeComment", comment._id, function(err) {
+            Meteor.call("removeComment", mariesComment._id, function(err) {
                 assert.isUndefined(err);
 
                 assert.equal(Authors.find({ "username": "marie" }).count(), 1, "Author still present post-delete");
@@ -213,19 +222,20 @@ if (Meteor.isClient) {
 
     testPublication("Should publish new author and remove old if comment author is changed", {
         publication: "userPosts",
-        args: [ "albert" ],
+        args: [ "marie" ],
 
         testHandler: function(assert, onComplete) {
-            var comment = Comments.findOne({ author: "richard" });
+            var mariesSecondPost = Posts.findOne({ title: "Marie's second post" });
+            var comment = Comments.findOne({ postId: mariesSecondPost._id, author: "richard" });
 
             assert.equal(Authors.find({ "username": "richard" }).count(), 1, "Old author present pre-change");
-            assert.equal(Authors.find({ "username": "marie" }).count(), 0, "New author absent pre-change");
+            assert.equal(Authors.find({ "username": "john" }).count(), 0, "New author absent pre-change");
 
-            Meteor.call("updateCommentAuthor", comment._id, "marie", function(err) {
+            Meteor.call("updateCommentAuthor", comment._id, "john", function(err) {
                 assert.isUndefined(err);
 
                 assert.equal(Authors.find({ "username": "richard" }).count(), 0, "Old author absent post-change");
-                assert.equal(Authors.find({ "username": "marie" }).count(), 1, "New author present post-change");
+                assert.equal(Authors.find({ "username": "john" }).count(), 1, "New author present post-change");
 
                 onComplete();
             });
@@ -306,15 +316,22 @@ if (Meteor.isServer) {
         }()),
 
         removeComment: function(commentId) {
-            var count = Comments.remove(commentId);
+            console.log("calling removeComment");
+            Comments.remove(commentId);
         },
 
         updatePostAuthor: function(postId, newAuthor) {
+            console.log("calling updatePostAuthor, postId: " + postId + ", newAuthor: " + newAuthor);
             Posts.update({ _id: postId }, { $set: { author: newAuthor } });
         },
 
         updateCommentAuthor: function(commentId, newAuthor) {
+            console.log("calling updateCommentAuthor, commentId: " + commentId + ", newAuthor: " + newAuthor);
             Comments.update({ _id: commentId }, { $set: { author: newAuthor } });
+        },
+
+        log: function(message) {
+            console.log(message);
         }
     });
 }

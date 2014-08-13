@@ -21,27 +21,57 @@ Meteor.publishComposite = function(name, options) {
 
 
 var Subscription = function(meteorSub) {
+    var self = this;
     this.meteorSub = meteorSub;
+    this.docHash = {};
     this.refCounter = new DocumentRefCounter({
-        onChange: function(collectionName, doc, refCount) {
+        onChange: function(collectionName, docId, refCount) {
+            debugLog("Subscription.refCounter.onChange", collectionName + ":" + docId + " " + refCount);
             if (refCount <= 0) {
-                meteorSub.removed(collectionName, doc._id);
+                meteorSub.removed(collectionName, docId);
+                self._removeDocHash(docId);
             }
         }
     });
 };
 
 Subscription.prototype.added = function(collectionName, doc) {
-    this.refCounter.increment(collectionName, doc);
-    this.meteorSub.added(collectionName, doc._id, doc);
+    this.refCounter.increment(collectionName, doc._id.toString());
+
+    if (this._hasDocChanged(doc)) {
+        debugLog("Subscription.added", collectionName + ":" + doc._id + " " + JSON.stringify(doc));
+        this.meteorSub.added(collectionName, doc._id, doc);
+        this._addDocHash(doc);
+    }
 };
 
 Subscription.prototype.changed = function(collectionName, doc) {
-    this.meteorSub.changed(collectionName, doc._id, doc);
+    if (this._hasDocChanged(doc)) {
+        debugLog("Subscription.changed", collectionName + ":" + doc._id + " " + JSON.stringify(doc));
+        this.meteorSub.changed(collectionName, doc._id, doc);
+        this._addDocHash(doc);
+    }
 };
 
-Subscription.prototype.removed = function(collectionName, doc) {
-    this.refCounter.decrement(collectionName, doc);
+Subscription.prototype.removed = function(collectionName, docId) {
+    debugLog("Subscription.removed", collectionName + ":" + docId);
+    this.refCounter.decrement(collectionName, docId.toString());
+};
+
+Subscription.prototype._addDocHash = function(doc) {
+    this.docHash[doc._id.toString()] = doc;
+};
+
+Subscription.prototype._hasDocChanged = function(doc) {
+    var existingDoc = this.docHash[doc._id.toString()];
+
+    if (!existingDoc) { return true; }
+
+    return !_.isEqual(doc, existingDoc);
+};
+
+Subscription.prototype._removeDocHash = function(docId) {
+    delete this.docHash[docId.toString()];
 };
 
 
@@ -55,35 +85,79 @@ var Publication = function(subscription, options, args) {
 };
 
 Publication.prototype.publish = function() {
-    this.cursor = this.options.find.apply(this.subscription, this.args);
+    this.cursor = this._getCursor();
 
     if (!this.cursor) { return; }
 
-    this.collectionName = this.cursor._getCollectionName();
+    this.collectionName = this._getCollectionName();
     var self = this;
 
     this.observeHandle = this.cursor.observe({
         added: function(doc) {
-            self.subscription.added(self.collectionName, doc);
-            self._publishChildrenOf(doc);
+            var alreadyPublished = !!self.childPublications[doc._id];
+
+            if (alreadyPublished) {
+                debugLog("Publication.observeHandle.added", self.collectionName + ":" + doc._id + " already published");
+                self.subscription.changed(self.collectionName, doc);
+                self._republishChildrenOf(doc);
+            } else {
+                self.subscription.added(self.collectionName, doc);
+                self._publishChildrenOf(doc);
+            }
         },
         changed: function(doc) {
-            self._unpublishChildrenOf(doc._id);
-            self._publishChildrenOf(doc);
+            debugLog("Publication.observeHandle.changed", self.collectionName + ":" + doc._id);
             self.subscription.changed(self.collectionName, doc);
+            self._republishChildrenOf(doc);
         },
         removed: function(doc) {
+            debugLog("Publication.observeHandle.removed", self.collectionName + ":" + doc._id);
             self._unpublishChildrenOf(doc._id);
-            self.subscription.removed(self.collectionName, doc);
+            self.subscription.removed(self.collectionName, doc._id);
         }
     });
 };
 
 Publication.prototype.unpublish = function() {
-    this.observeHandle.stop();
+    if (this.observeHandle) {
+        this.observeHandle.stop();
+    }
 
     this._removeAllCursorDocuments();
     this._unpublishChildPublications();
+};
+
+Publication.prototype.republish = function() {
+    var self = this;
+
+    this.cursor.rewind();
+    var oldPublishedDocs = this.cursor.map(function(doc) { return doc._id.toString(); });
+
+    debugLog("Publication.republish", "stop observing old cursor");
+    this.observeHandle.stop();
+    delete this.observeHandle;
+
+    debugLog("Publication.republish", "run .publish again");
+    this.publish();
+
+    this.cursor.rewind();
+    var newPublishedDocs = this.cursor.map(function(doc) { return doc._id.toString(); });
+
+    var docsToRemove = _.difference(oldPublishedDocs, newPublishedDocs);
+    debugLog("Publication.republish", "unpublish docs from old cursor, " + JSON.stringify(docsToRemove));
+    _.each(docsToRemove, function(docId) {
+        // self._unpublishChildrenOf(docId);
+        self.subscription.removed(self.collectionName, docId);
+    });
+};
+
+Publication.prototype._getCursor = function() {
+    return this.options.find.apply(this.subscription.meteorSub, this.args);
+};
+
+Publication.prototype._getCollectionName = function() {
+    if (!this.cursor) { return; }
+    return this.cursor._getCollectionName();
 };
 
 Publication.prototype._publishChildrenOf = function(doc) {
@@ -96,7 +170,17 @@ Publication.prototype._publishChildrenOf = function(doc) {
     }, this);
 };
 
+Publication.prototype._republishChildrenOf = function(doc) {
+    if (this.childPublications[doc._id]) {
+        _.each(this.childPublications[doc._id], function(pub) {
+            pub.args[0] = doc;
+            pub.republish();
+        });
+    }
+};
+
 Publication.prototype._unpublishChildrenOf = function(docId) {
+    debugLog("Publication._unpublishChildrenOf", "unpublishing children of " + this._getCollectionName() + ":" + docId);
     if (this.childPublications[docId]) {
         _.each(this.childPublications[docId], function(pub) {
             pub.unpublish();
@@ -106,16 +190,18 @@ Publication.prototype._unpublishChildrenOf = function(docId) {
 };
 
 Publication.prototype._removeAllCursorDocuments = function() {
+    if (!this.cursor) { return; }
+
     this.cursor.rewind();
     this.cursor.forEach(function(doc) {
-        this.subscription.removed(this.collectionName, doc);
+        this.subscription.removed(this.collectionName, doc._id);
     }, this);
 };
 
 Publication.prototype._unpublishChildPublications = function() {
-    for (var i in this.childPublications) {
-        this._unpublishChildrenOf(i);
-        delete this.childPublications[i];
+    for (var docId in this.childPublications) {
+        this._unpublishChildrenOf(docId);
+        delete this.childPublications[docId];
     }
 };
 
@@ -125,19 +211,26 @@ var DocumentRefCounter = function(observer) {
     this.observer = observer;
 };
 
-DocumentRefCounter.prototype.increment = function(collectionName, doc) {
-    var key = collectionName + ":" + doc._id;
+DocumentRefCounter.prototype.increment = function(collectionName, docId) {
+    var key = collectionName + ":" + docId;
     if (!this.heap[key]) {
         this.heap[key] = 0;
     }
     this.heap[key]++;
 };
 
-DocumentRefCounter.prototype.decrement = function(collectionName, doc) {
-    var key = collectionName + ":" + doc._id;
+DocumentRefCounter.prototype.decrement = function(collectionName, docId) {
+    var key = collectionName + ":" + docId;
     if (this.heap[key]) {
         this.heap[key]--;
 
-        this.observer.onChange(collectionName, doc, this.heap[key]);
+        this.observer.onChange(collectionName, docId, this.heap[key]);
     }
 };
+
+
+var enableDebugLogging = false;
+var debugLog = enableDebugLogging ? function(source, message) {
+    while (source.length < 35) { source += " "; }
+    console.log("[" + source + "] " + message);
+} : function() { };
