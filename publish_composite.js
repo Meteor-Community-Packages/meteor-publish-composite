@@ -26,7 +26,7 @@ var Subscription = function(meteorSub) {
     this.docHash = {};
     this.refCounter = new DocumentRefCounter({
         onChange: function(collectionName, docId, refCount) {
-            debugLog("Subscription.refCounter.onChange", collectionName + ":" + docId + " " + refCount);
+            debugLog("Subscription.refCounter.onChange", collectionName + ":" + docId.valueOf() + " " + refCount);
             if (refCount <= 0) {
                 meteorSub.removed(collectionName, docId);
                 self._removeDocHash(docId);
@@ -36,10 +36,10 @@ var Subscription = function(meteorSub) {
 };
 
 Subscription.prototype.added = function(collectionName, doc) {
-    this.refCounter.increment(collectionName, doc._id.toString());
+    this.refCounter.increment(collectionName, doc._id);
 
     if (this._hasDocChanged(doc)) {
-        debugLog("Subscription.added", collectionName + ":" + doc._id + " " + JSON.stringify(doc));
+        debugLog("Subscription.added", collectionName + ":" + doc._id); // + " " + JSON.stringify(doc));
         this.meteorSub.added(collectionName, doc._id, doc);
         this._addDocHash(doc);
     }
@@ -47,23 +47,23 @@ Subscription.prototype.added = function(collectionName, doc) {
 
 Subscription.prototype.changed = function(collectionName, doc) {
     if (this._hasDocChanged(doc)) {
-        debugLog("Subscription.changed", collectionName + ":" + doc._id + " " + JSON.stringify(doc));
+        debugLog("Subscription.changed", collectionName + ":" + doc._id); // + " " + JSON.stringify(doc));
         this.meteorSub.changed(collectionName, doc._id, doc);
         this._addDocHash(doc);
     }
 };
 
 Subscription.prototype.removed = function(collectionName, docId) {
-    debugLog("Subscription.removed", collectionName + ":" + docId);
-    this.refCounter.decrement(collectionName, docId.toString());
+    debugLog("Subscription.removed", collectionName + ":" + docId.valueOf());
+    this.refCounter.decrement(collectionName, docId);
 };
 
 Subscription.prototype._addDocHash = function(doc) {
-    this.docHash[doc._id.toString()] = doc;
+    this.docHash[doc._id.valueOf()] = doc;
 };
 
 Subscription.prototype._hasDocChanged = function(doc) {
-    var existingDoc = this.docHash[doc._id.toString()];
+    var existingDoc = this.docHash[doc._id.valueOf()];
 
     if (!existingDoc) { return true; }
 
@@ -71,7 +71,7 @@ Subscription.prototype._hasDocChanged = function(doc) {
 };
 
 Subscription.prototype._removeDocHash = function(docId) {
-    delete this.docHash[docId.toString()];
+    delete this.docHash[docId.valueOf()];
 };
 
 
@@ -131,7 +131,7 @@ Publication.prototype.republish = function() {
     var self = this;
 
     this.cursor.rewind();
-    var oldPublishedDocs = this.cursor.map(function(doc) { return doc._id.toString(); });
+    var oldPublishedIds = this.cursor.map(function(doc) { return doc._id; });
 
     debugLog("Publication.republish", "stop observing old cursor");
     this.observeHandle.stop();
@@ -141,12 +141,16 @@ Publication.prototype.republish = function() {
     this.publish();
 
     this.cursor.rewind();
-    var newPublishedDocs = this.cursor.map(function(doc) { return doc._id.toString(); });
+    var newPublishedIds = this.cursor.map(function(doc) { return doc._id.valueOf(); });
 
-    var docsToRemove = _.difference(oldPublishedDocs, newPublishedDocs);
+    var docsToRemove = _.filter(oldPublishedIds, function(oldId) {
+        oldId = oldId.valueOf();
+        return !_.any(newPublishedIds, function(newId) { return newId === oldId; });
+    });
+
     debugLog("Publication.republish", "unpublish docs from old cursor, " + JSON.stringify(docsToRemove));
     _.each(docsToRemove, function(docId) {
-        // self._unpublishChildrenOf(docId);
+        self._unpublishChildrenOf(docId);
         self.subscription.removed(self.collectionName, docId);
     });
 };
@@ -180,6 +184,8 @@ Publication.prototype._republishChildrenOf = function(doc) {
 };
 
 Publication.prototype._unpublishChildrenOf = function(docId) {
+    docId = docId.valueOf();
+
     debugLog("Publication._unpublishChildrenOf", "unpublishing children of " + this._getCollectionName() + ":" + docId);
     if (this.childPublications[docId]) {
         _.each(this.childPublications[docId], function(pub) {
@@ -212,7 +218,7 @@ var DocumentRefCounter = function(observer) {
 };
 
 DocumentRefCounter.prototype.increment = function(collectionName, docId) {
-    var key = collectionName + ":" + docId;
+    var key = collectionName + ":" + docId.valueOf();
     if (!this.heap[key]) {
         this.heap[key] = 0;
     }
@@ -220,7 +226,7 @@ DocumentRefCounter.prototype.increment = function(collectionName, docId) {
 };
 
 DocumentRefCounter.prototype.decrement = function(collectionName, docId) {
-    var key = collectionName + ":" + docId;
+    var key = collectionName + ":" + docId.valueOf();
     if (this.heap[key]) {
         this.heap[key]--;
 
