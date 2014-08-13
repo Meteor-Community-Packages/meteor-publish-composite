@@ -241,6 +241,29 @@ if (Meteor.isClient) {
             });
         }
     });
+
+    testPublication("Should remove post, comment, and comment author if post is deleted", {
+        publication: "userPosts",
+        args: [ "marie" ],
+
+        testHandler: function(assert, onComplete) {
+            var mariesFirstPost = Posts.findOne({ title: "Marie's first post" });
+
+            assert.isTrue(typeof mariesFirstPost !== "undefined" , "Post present pre-change");
+            assert.equal(Comments.find({ postId: mariesFirstPost._id, author: "albert" }).count(), 1, "Comment present pre-change");
+            assert.equal(Authors.find({ username: "albert" }).count(), 1, "Comment author present pre-change");
+
+            Meteor.call("removePost", mariesFirstPost._id, function(err) {
+                assert.isUndefined(err);
+
+                assert.equal(Posts.find({ title: "Marie's first post" }).count(), 0, "Post absent post-change");
+                assert.equal(Comments.find({ postId: mariesFirstPost._id, author: "albert" }).count(), 0, "Comment absent post-change");
+                assert.equal(Authors.find({ username: "albert" }).count(), 0, "Comment author absent post-change");
+
+                onComplete();
+            });
+        }
+    });
 }
 
 
@@ -315,23 +338,30 @@ if (Meteor.isServer) {
             }
         }()),
 
-        removeComment: function(commentId) {
-            console.log("calling removeComment");
-            Comments.remove(commentId);
-        },
-
-        updatePostAuthor: function(postId, newAuthor) {
-            console.log("calling updatePostAuthor, postId: " + postId + ", newAuthor: " + newAuthor);
-            Posts.update({ _id: postId }, { $set: { author: newAuthor } });
-        },
-
-        updateCommentAuthor: function(commentId, newAuthor) {
-            console.log("calling updateCommentAuthor, commentId: " + commentId + ", newAuthor: " + newAuthor);
-            Comments.update({ _id: commentId }, { $set: { author: newAuthor } });
-        },
-
         log: function(message) {
             console.log(message);
         }
     });
 }
+
+Meteor.methods({
+    removePost: function(postId) {
+        console.log("calling removePost");
+        Posts.remove(postId);
+    },
+
+    removeComment: function(commentId) {
+        console.log("calling removeComment");
+        Comments.remove(commentId);
+    },
+
+    updatePostAuthor: function(postId, newAuthor) {
+        console.log("calling updatePostAuthor, postId: " + postId + ", newAuthor: " + newAuthor);
+        Posts.update({ _id: postId }, { $set: { author: newAuthor } });
+    },
+
+    updateCommentAuthor: function(commentId, newAuthor) {
+        console.log("calling updateCommentAuthor, commentId: " + commentId + ", newAuthor: " + newAuthor);
+        Comments.update({ _id: commentId }, { $set: { author: newAuthor } });
+    }
+});
