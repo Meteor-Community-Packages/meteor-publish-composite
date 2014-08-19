@@ -82,6 +82,7 @@ var Publication = function(subscription, options, args) {
     this.args = args || [];
     this.children = options.children || [];
     this.childPublications = [];
+    this.collectionName = options.collectionName;
 };
 
 Publication.prototype.publish = function() {
@@ -89,7 +90,7 @@ Publication.prototype.publish = function() {
 
     if (!this.cursor) { return; }
 
-    this.collectionName = this._getCollectionName();
+    var collectionName = this._getCollectionName();
     var self = this;
 
     this.observeHandle = this.cursor.observe({
@@ -97,23 +98,23 @@ Publication.prototype.publish = function() {
             var alreadyPublished = !!self.childPublications[doc._id];
 
             if (alreadyPublished) {
-                debugLog("Publication.observeHandle.added", self.collectionName + ":" + doc._id + " already published");
-                self.subscription.changed(self.collectionName, doc);
+                debugLog("Publication.observeHandle.added", collectionName + ":" + doc._id + " already published");
+                self.subscription.changed(collectionName, doc);
                 self._republishChildrenOf(doc);
             } else {
-                self.subscription.added(self.collectionName, doc);
+                self.subscription.added(collectionName, doc);
                 self._publishChildrenOf(doc);
             }
         },
         changed: function(doc) {
-            debugLog("Publication.observeHandle.changed", self.collectionName + ":" + doc._id);
-            self.subscription.changed(self.collectionName, doc);
+            debugLog("Publication.observeHandle.changed", collectionName + ":" + doc._id);
+            self.subscription.changed(collectionName, doc);
             self._republishChildrenOf(doc);
         },
         removed: function(doc) {
-            debugLog("Publication.observeHandle.removed", self.collectionName + ":" + doc._id);
+            debugLog("Publication.observeHandle.removed", collectionName + ":" + doc._id);
             self._unpublishChildrenOf(doc._id);
-            self.subscription.removed(self.collectionName, doc._id);
+            self.subscription.removed(collectionName, doc._id);
         }
     });
 };
@@ -129,6 +130,7 @@ Publication.prototype.unpublish = function() {
 
 Publication.prototype.republish = function() {
     var self = this;
+    var collectionName = this._getCollectionName();
 
     this.cursor.rewind();
     var oldPublishedIds = this.cursor.map(function(doc) { return doc._id; });
@@ -151,7 +153,7 @@ Publication.prototype.republish = function() {
     debugLog("Publication.republish", "unpublish docs from old cursor, " + JSON.stringify(docsToRemove));
     _.each(docsToRemove, function(docId) {
         self._unpublishChildrenOf(docId);
-        self.subscription.removed(self.collectionName, docId);
+        self.subscription.removed(collectionName, docId);
     });
 };
 
@@ -160,8 +162,7 @@ Publication.prototype._getCursor = function() {
 };
 
 Publication.prototype._getCollectionName = function() {
-    if (!this.cursor) { return; }
-    return this.cursor._getCollectionName();
+    return this.collectionName || (this.cursor && this.cursor._getCollectionName());
 };
 
 Publication.prototype._publishChildrenOf = function(doc) {
@@ -198,9 +199,11 @@ Publication.prototype._unpublishChildrenOf = function(docId) {
 Publication.prototype._removeAllCursorDocuments = function() {
     if (!this.cursor) { return; }
 
+    var collectionName = this._getCollectionName();
+
     this.cursor.rewind();
     this.cursor.forEach(function(doc) {
-        this.subscription.removed(this.collectionName, doc._id);
+        this.subscription.removed(collectionName, doc._id);
     }, this);
 };
 
@@ -235,7 +238,7 @@ DocumentRefCounter.prototype.decrement = function(collectionName, docId) {
 };
 
 
-var enableDebugLogging = false;
+var enableDebugLogging = true;
 var debugLog = enableDebugLogging ? function(source, message) {
     while (source.length < 35) { source += " "; }
     console.log("[" + source + "] " + message);
