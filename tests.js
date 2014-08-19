@@ -51,6 +51,17 @@ if (Meteor.isServer) {
             children: postPublicationChildren
         }
     });
+
+    Meteor.publishComposite("postsAsArticles", {
+        collectionName: "articles",
+        find: function() {
+            return Posts.find();
+        }
+    });
+}
+
+if (Meteor.isClient) {
+    Articles = new Meteor.Collection("articles");
 }
 
 
@@ -262,6 +273,17 @@ if (Meteor.isClient) {
 
                 onComplete();
             });
+        }
+    });
+
+    testPublication("Should publish posts to client side collection named 'articles'", {
+        publication: "postsAsArticles",
+
+        testHandler: function(assert, onComplete) {
+            assert.equal(Posts.find().count(), 0, "Posts collection empty on client");
+            assert.equal(Articles.find().count(), 4, "Articles collection not empty on client");
+
+            onComplete();
         }
     });
 }
