@@ -58,6 +58,23 @@ if (Meteor.isServer) {
             return Posts.find();
         }
     });
+
+    Meteor.publishComposite("pubWithChildThatReturnsNullIfAuthorIsMarie", {
+        find: function() {
+            return Posts.find();
+        },
+        children: [
+            {
+                find: function(post) {
+                    if (post.author === "marie") {
+                        return null;
+                    }
+
+                    return Comments.find({ postId: post._id });
+                }
+            }
+        ]
+    });
 }
 
 if (Meteor.isClient) {
@@ -260,7 +277,7 @@ if (Meteor.isClient) {
         testHandler: function(assert, onComplete) {
             var mariesFirstPost = Posts.findOne({ title: "Marie's first post" });
 
-            assert.isTrue(typeof mariesFirstPost !== "undefined" , "Post present pre-change");
+            assert.isTrue(typeof mariesFirstPost !== "undefined", "Post present pre-change");
             assert.equal(Comments.find({ postId: mariesFirstPost._id, author: "albert" }).count(), 1, "Comment present pre-change");
             assert.equal(Authors.find({ username: "albert" }).count(), 1, "Comment author present pre-change");
 
@@ -284,6 +301,46 @@ if (Meteor.isClient) {
             assert.equal(Articles.find().count(), 4, "Articles collection not empty on client");
 
             onComplete();
+        }
+    });
+
+    testPublication("Should handle going from null cursor to non-null cursor when republishing", {
+        publication: "pubWithChildThatReturnsNullIfAuthorIsMarie",
+
+        testHandler: function(assert, onComplete) {
+            var mariesFirstPost = Posts.findOne({ title: "Marie's first post" });
+            var comments = Comments.find({ postId: mariesFirstPost._id });
+
+            assert.isTrue(comments.count() === 0, "No comments published");
+            
+            Meteor.call("updatePostAuthor", mariesFirstPost._id, "albert", function(err) {
+                assert.isUndefined(err);
+
+                comments = Comments.find({ postId: mariesFirstPost._id });
+                assert.isTrue(comments.count() > 0, "Comments published");
+
+                onComplete();
+            });
+        }
+    });
+
+    testPublication("Should handle going from non-null cursor to null cursor when republishing", {
+        publication: "pubWithChildThatReturnsNullIfAuthorIsMarie",
+
+        testHandler: function(assert, onComplete) {
+            var albertsPost = Posts.findOne({ author: "albert" });
+            var comments = Comments.find({ postId: albertsPost._id });
+
+            assert.isTrue(comments.count() > 0, "Comments published");
+            
+            Meteor.call("updatePostAuthor", albertsPost._id, "marie", function(err) {
+                assert.isUndefined(err);
+
+                comments = Comments.find({ postId: albertsPost._id });
+                assert.isTrue(comments.count() === 0, "No comments published");
+
+                onComplete();
+            });
         }
     });
 }
