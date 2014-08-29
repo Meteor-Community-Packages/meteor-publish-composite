@@ -1,5 +1,5 @@
 Package.describe({
-    name: "mrt:publish-composite",
+    name: "reywood:publish-composite",
     summary: "Publish a set of documents and their child documents in one publication",
     version: "1.3.0",
     git: "https://github.com/englue/meteor-publish-composite.git"
@@ -13,7 +13,7 @@ Package.on_use(function (api) {
 
 
 Package.on_test(function(api) {
-    api.use("mrt:publish-composite");
+    api.use("reywood:publish-composite");
     api.use(["tinytest", "test-helpers"]);
 
     api.add_files([ "tests.js" ]);
