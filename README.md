@@ -10,7 +10,7 @@ This project differs from many other parent/child relationship mappers in its fl
 ## Installation
 
 ```sh
-$ mrt add publish-composite
+$ meteor add mrt:publish-composite
 ```
 
 
