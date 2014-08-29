@@ -1,5 +1,6 @@
 Package.describe({
-    summary: "Meteor.publishComposite provides a flexible way to publish a set of documents and their child documents in one go. In this way, a whole tree of documents can be published.",
+    name: "mrt:publish-composite",
+    summary: "Publish a set of documents and their child documents in one publication",
     version: "1.3.0",
     git: "https://github.com/englue/meteor-publish-composite.git"
 });
