@@ -4,7 +4,7 @@ Meteor.publishComposite = function(name, options) {
             instanceOptions = options,
             args = Array.prototype.slice.apply(arguments);
 
-        if (typeof instanceOptions === 'function') {
+        if (typeof instanceOptions === "function") {
             instanceOptions = instanceOptions.apply(this, args);
         }
 
@@ -39,7 +39,7 @@ Subscription.prototype.added = function(collectionName, doc) {
     this.refCounter.increment(collectionName, doc._id);
 
     if (this._hasDocChanged(doc)) {
-        debugLog("Subscription.added", collectionName + ":" + doc._id); // + " " + JSON.stringify(doc));
+        debugLog("Subscription.added", collectionName + ":" + doc._id);
         this.meteorSub.added(collectionName, doc._id, doc);
         this._addDocHash(doc);
     }
@@ -47,7 +47,7 @@ Subscription.prototype.added = function(collectionName, doc) {
 
 Subscription.prototype.changed = function(collectionName, doc) {
     if (this._hasDocChanged(doc)) {
-        debugLog("Subscription.changed", collectionName + ":" + doc._id); // + " " + JSON.stringify(doc));
+        debugLog("Subscription.changed", collectionName + ":" + doc._id);
         this.meteorSub.changed(collectionName, doc._id, doc);
         this._addDocHash(doc);
     }
@@ -132,18 +132,30 @@ Publication.prototype.republish = function() {
     var self = this;
     var collectionName = this._getCollectionName();
 
-    this.cursor.rewind();
-    var oldPublishedIds = this.cursor.map(function(doc) { return doc._id; });
+    var oldPublishedIds;
+    if (this.cursor) {
+        this.cursor.rewind();
+        oldPublishedIds = this.cursor.map(function(doc) { return doc._id; });
+    } else {
+        oldPublishedIds = [];
+    }
 
     debugLog("Publication.republish", "stop observing old cursor");
-    this.observeHandle.stop();
-    delete this.observeHandle;
+    if (this.observeHandle) {
+        this.observeHandle.stop();
+        delete this.observeHandle;
+    }
 
     debugLog("Publication.republish", "run .publish again");
     this.publish();
 
-    this.cursor.rewind();
-    var newPublishedIds = this.cursor.map(function(doc) { return doc._id.valueOf(); });
+    var newPublishedIds;
+    if (this.cursor) {
+        this.cursor.rewind();
+        newPublishedIds = this.cursor.map(function(doc) { return doc._id.valueOf(); });
+    } else {
+        newPublishedIds = [];
+    }
 
     var docsToRemove = _.filter(oldPublishedIds, function(oldId) {
         oldId = oldId.valueOf();
