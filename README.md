@@ -183,3 +183,10 @@ Meteor.publishComposite('postsByUser', function(userId, limit) {
 var userId = 1, limit = 10;
 Meteor.subscribe('postsByUser', userId, limit);
 ```
+
+## More info
+
+For more info on how to use `Meteor.publishComposite`, check out these blog posts:
+
+* [Publishing Reactive Joins in Meteor](http://braindump.io/meteor/2014/09/12/publishing-reactive-joins-in-meteor.html)
+* [Publishing to an Alternative Client-side Collection in Meteor](http://braindump.io/meteor/2014/09/20/publishing-to-an-alternative-clientside-collection-in-meteor.html)
