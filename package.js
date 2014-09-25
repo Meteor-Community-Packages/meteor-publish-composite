@@ -1,6 +1,6 @@
 Package.describe({
     name: "reywood:publish-composite",
-    summary: "Publish a set of documents and their child documents in one publication",
+    summary: "Publish a set of related documents with a reactive join",
     version: "1.3.0",
     git: "https://github.com/englue/meteor-publish-composite.git"
 });
