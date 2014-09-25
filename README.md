@@ -1,9 +1,7 @@
 meteor-publish-composite
 ========================
 
-`Meteor.publishComposite(...)` provides a flexible way to publish a set of documents and their
-child documents all at once. This allows a whole tree of documents to be published. The published
-collections are reactive and will update when additions/changes/deletions are made.
+`Meteor.publishComposite(...)` provides a flexible way to publish a set of related documents using a reactive join. This makes it easy to publish a whole tree of documents at once. The published collections are reactive and will update when additions/changes/deletions are made.
 
 This project differs from many other parent/child relationship mappers in its flexibility. The relationship between a parent and its children can be based on almost anything. For example, let's say you have a site that displays news articles. On each article page, you would like to display a list at the end containing a couple of related articles. You could use `publishComposite` to publish the primary article, scan the body for keywords which are then used to search for other articles, and publish these related articles as children. Of course, the keyword extraction and searching are up to you to implement.
 
@@ -28,16 +26,9 @@ Arguments
 
 * **`options`** -- *object literal or callback function*
 
-    An object literal specifying the configuration of the composite publication **or** a function that
-    returns said object literal. If a function is used, it will receive the arguments passed to
-    `Meteor.subscribe('myPub', arg1, arg2, ...)` (much like the `func` argument of
-    [`Meteor.publish`](http://docs.meteor.com/#meteor_publish)). Basically, if your publication will
-    take **no** arguments, pass an object literal for this argument. If your publication **will** take
-    arguments, use a function that returns an object literal.
+    An object literal specifying the configuration of the composite publication **or** a function that returns said object literal. If a function is used, it will receive the arguments passed to `Meteor.subscribe('myPub', arg1, arg2, ...)` (much like the `func` argument of [`Meteor.publish`](http://docs.meteor.com/#meteor_publish)). Basically, if your publication will take **no** arguments, pass an object literal for this argument. If your publication **will** take arguments, use a function that returns an object literal.
 
-    The object literal should have two properties, `find` and `children`. The `find` property's value must
-    be a function that returns a **cursor** of your top level documents. The `children` property's value should
-    be an array containing any number of object literals with this same structure.
+    The object literal must have a `find` property, and can optionally have `children` and `collectionName` properties. The `find` property's value must be a function that returns a **cursor** of your top level documents. The `children` property's value should be an array containing any number of object literals with this same structure. The `collectionName` property's value, if present, should be a string specifying an alternate collection name to publish the documents to (see [this blog post](blog-collection-name) for more details).
 
     ```javascript
     {
@@ -188,5 +179,9 @@ Meteor.subscribe('postsByUser', userId, limit);
 
 For more info on how to use `Meteor.publishComposite`, check out these blog posts:
 
-* [Publishing Reactive Joins in Meteor](http://braindump.io/meteor/2014/09/12/publishing-reactive-joins-in-meteor.html)
-* [Publishing to an Alternative Client-side Collection in Meteor](http://braindump.io/meteor/2014/09/20/publishing-to-an-alternative-clientside-collection-in-meteor.html)
+* [Publishing Reactive Joins in Meteor](blog-reactive-joins)
+* [Publishing to an Alternative Client-side Collection in Meteor](blog-collection-name)
+
+
+[blog-reactive-joins]: http://braindump.io/meteor/2014/09/12/publishing-reactive-joins-in-meteor.html
+[blog-collection-name]: http://braindump.io/meteor/2014/09/20/publishing-to-an-alternative-clientside-collection-in-meteor.html
