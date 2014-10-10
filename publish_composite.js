@@ -45,11 +45,19 @@ Subscription.prototype.added = function(collectionName, doc) {
     }
 };
 
-Subscription.prototype.changed = function(collectionName, doc) {
-    if (this._hasDocChanged(doc)) {
-        debugLog("Subscription.changed", collectionName + ":" + doc._id);
-        this.meteorSub.changed(collectionName, doc._id, doc);
-        this._addDocHash(doc);
+Subscription.prototype.changed = function(collectionName, newDoc, oldDoc) {
+    if (this._hasDocChanged(newDoc)) {
+        debugLog("Subscription.changed", collectionName + ":" + newDoc._id);
+
+        var prop;
+        for (prop in oldDoc) {
+            if (oldDoc.hasOwnProperty(prop) && !newDoc.hasOwnProperty(prop)) {
+                newDoc[prop] = undefined;
+            }
+        }
+
+        this.meteorSub.changed(collectionName, newDoc._id, newDoc);
+        this._addDocHash(newDoc);
     }
 };
 
@@ -106,10 +114,10 @@ Publication.prototype.publish = function() {
                 self._publishChildrenOf(doc);
             }
         },
-        changed: function(doc) {
-            debugLog("Publication.observeHandle.changed", collectionName + ":" + doc._id);
-            self.subscription.changed(collectionName, doc);
-            self._republishChildrenOf(doc);
+        changed: function(newDoc, oldDoc) {
+            debugLog("Publication.observeHandle.changed", collectionName + ":" + newDoc._id);
+            self.subscription.changed(collectionName, newDoc, oldDoc);
+            self._republishChildrenOf(newDoc);
         },
         removed: function(doc) {
             debugLog("Publication.observeHandle.removed", collectionName + ":" + doc._id);
