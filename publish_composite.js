@@ -38,26 +38,18 @@ var Subscription = function(meteorSub) {
 Subscription.prototype.added = function(collectionName, doc) {
     this.refCounter.increment(collectionName, doc._id);
 
-    if (this._hasDocChanged(doc)) {
+    if (this._hasDocChanged(doc._id, doc)) {
         debugLog("Subscription.added", collectionName + ":" + doc._id);
         this.meteorSub.added(collectionName, doc._id, doc);
         this._addDocHash(doc);
     }
 };
 
-Subscription.prototype.changed = function(collectionName, newDoc, oldDoc) {
-    if (this._hasDocChanged(newDoc)) {
-        debugLog("Subscription.changed", collectionName + ":" + newDoc._id);
-
-        var prop;
-        for (prop in oldDoc) {
-            if (oldDoc.hasOwnProperty(prop) && !newDoc.hasOwnProperty(prop)) {
-                newDoc[prop] = undefined;
-            }
-        }
-
-        this.meteorSub.changed(collectionName, newDoc._id, newDoc);
-        this._addDocHash(newDoc);
+Subscription.prototype.changed = function(collectionName, id, changes) {
+    if (this._hasDocChanged(id, changes)) {
+        debugLog("Subscription.changed", collectionName + ":" + id);
+        this.meteorSub.changed(collectionName, id, changes);
+        this._updateDocHash(id, changes);
     }
 };
 
@@ -70,12 +62,24 @@ Subscription.prototype._addDocHash = function(doc) {
     this.docHash[doc._id.valueOf()] = doc;
 };
 
-Subscription.prototype._hasDocChanged = function(doc) {
-    var existingDoc = this.docHash[doc._id.valueOf()];
+Subscription.prototype._updateDocHash = function(id, changes) {
+    var key = id.valueOf();
+    var existingDoc = this.docHash[key] || {};
+    this.docHash[key] = _.extend(existingDoc, changes);
+};
+
+Subscription.prototype._hasDocChanged = function(id, doc) {
+    var existingDoc = this.docHash[id.valueOf()];
 
     if (!existingDoc) { return true; }
 
-    return !_.isEqual(doc, existingDoc);
+    for (var i in doc) {
+        if (doc.hasOwnProperty(i) && !_.isEqual(doc[i], existingDoc[i])) {
+            return true;
+        }
+    }
+
+    return false;
 };
 
 Subscription.prototype._removeDocHash = function(docId) {
@@ -107,16 +111,15 @@ Publication.prototype.publish = function() {
 
             if (alreadyPublished) {
                 debugLog("Publication.observeHandle.added", collectionName + ":" + doc._id + " already published");
-                self.subscription.changed(collectionName, doc);
+                self.subscription.changed(collectionName, doc._id, doc);
                 self._republishChildrenOf(doc);
             } else {
                 self.subscription.added(collectionName, doc);
                 self._publishChildrenOf(doc);
             }
         },
-        changed: function(newDoc, oldDoc) {
+        changed: function(newDoc) {
             debugLog("Publication.observeHandle.changed", collectionName + ":" + newDoc._id);
-            self.subscription.changed(collectionName, newDoc, oldDoc);
             self._republishChildrenOf(newDoc);
         },
         removed: function(doc) {
@@ -125,56 +128,39 @@ Publication.prototype.publish = function() {
             self.subscription.removed(collectionName, doc._id);
         }
     });
+
+    this.observeChangesHandle = this.cursor.observeChanges({
+        changed: function(id, fields) {
+            debugLog("Publication.observeChangesHandle.changed", collectionName + ":" + id);
+            self.subscription.changed(collectionName, id, fields);
+        }
+    });
 };
 
 Publication.prototype.unpublish = function() {
-    if (this.observeHandle) {
-        this.observeHandle.stop();
-    }
-
+    this._stopObservingCursor();
     this._removeAllCursorDocuments();
     this._unpublishChildPublications();
 };
 
-Publication.prototype.republish = function() {
-    var self = this;
+Publication.prototype._republish = function() {
     var collectionName = this._getCollectionName();
+    var oldPublishedIds = this._getPublishedIds();
 
-    var oldPublishedIds;
-    if (this.cursor) {
-        this.cursor.rewind();
-        oldPublishedIds = this.cursor.map(function(doc) { return doc._id; });
-    } else {
-        oldPublishedIds = [];
-    }
+    debugLog("Publication._republish", "stop observing old cursor");
+    this._stopObservingCursor();
 
-    debugLog("Publication.republish", "stop observing old cursor");
-    if (this.observeHandle) {
-        this.observeHandle.stop();
-        delete this.observeHandle;
-    }
-
-    debugLog("Publication.republish", "run .publish again");
+    debugLog("Publication._republish", "run .publish again");
     this.publish();
 
-    var newPublishedIds;
-    if (this.cursor) {
-        this.cursor.rewind();
-        newPublishedIds = this.cursor.map(function(doc) { return doc._id.valueOf(); });
-    } else {
-        newPublishedIds = [];
-    }
+    var newPublishedIds = this._getPublishedIds();
+    var docsToRemove = _.difference(oldPublishedIds, newPublishedIds);
 
-    var docsToRemove = _.filter(oldPublishedIds, function(oldId) {
-        oldId = oldId.valueOf();
-        return !_.any(newPublishedIds, function(newId) { return newId === oldId; });
-    });
-
-    debugLog("Publication.republish", "unpublish docs from old cursor, " + JSON.stringify(docsToRemove));
+    debugLog("Publication._republish", "unpublish docs from old cursor, " + JSON.stringify(docsToRemove));
     _.each(docsToRemove, function(docId) {
-        self._unpublishChildrenOf(docId);
-        self.subscription.removed(collectionName, docId);
-    });
+        this._unpublishChildrenOf(docId);
+        this.subscription.removed(collectionName, docId);
+    }, this);
 };
 
 Publication.prototype._getCursor = function() {
@@ -199,7 +185,7 @@ Publication.prototype._republishChildrenOf = function(doc) {
     if (this.childPublications[doc._id]) {
         _.each(this.childPublications[doc._id], function(pub) {
             pub.args[0] = doc;
-            pub.republish();
+            pub._republish();
         });
     }
 };
@@ -231,6 +217,27 @@ Publication.prototype._unpublishChildPublications = function() {
     for (var docId in this.childPublications) {
         this._unpublishChildrenOf(docId);
         delete this.childPublications[docId];
+    }
+};
+
+Publication.prototype._getPublishedIds = function() {
+    if (this.cursor) {
+        this.cursor.rewind();
+        return this.cursor.map(function(doc) { return doc._id; });
+    } else {
+        return [];
+    }
+};
+
+Publication.prototype._stopObservingCursor = function() {
+    if (this.observeHandle) {
+        this.observeHandle.stop();
+        delete this.observeHandle;
+    }
+
+    if (this.observeChangesHandle) {
+        this.observeChangesHandle.stop();
+        delete this.observeChangesHandle;
     }
 };
 

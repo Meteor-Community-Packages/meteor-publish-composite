@@ -75,19 +75,6 @@ if (Meteor.isServer) {
             }
         ]
     });
-
-    Meteor.publishComposite("pubWithChildThatShouldChangeOnUnset", {
-        find: function() {
-            return Posts.find();
-        },
-        children: [
-            {
-                find: function(post) {
-                    return Comments.find({ postId: post._id });
-                }
-            }
-        ]
-    });
 }
 
 if (Meteor.isClient) {
@@ -357,20 +344,20 @@ if (Meteor.isClient) {
         }
     });
 
-    testPublication("Should remove field form minimongo when $unset is called.", {
-        publication: "pubWithChildThatShouldChangeOnUnset",
+    testPublication("Should remove field from document when it is unset", {
+        publication: "allPosts",
 
         testHandler: function(assert, onComplete) {
             var albertsPost = Posts.findOne({ author: "albert" });
             var comment = Comments.findOne({ postId: albertsPost._id });
 
-            assert.isTrue(!!comment.text, "Comment have text field");
+            assert.isTrue(typeof comment.text !== "undefined", "Comment has text field");
 
             Meteor.call("unsetCommentText", comment._id, function(err) {
                 assert.isUndefined(err);
 
                 comment = Comments.findOne({ postId: albertsPost._id });
-                assert.isTrue(!comment.text, "Comment no longer have text field");
+                assert.isTrue(typeof comment.text === "undefined", "Comment no longer has text field");
 
                 onComplete();
             });
