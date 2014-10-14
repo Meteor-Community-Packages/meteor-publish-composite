@@ -75,6 +75,19 @@ if (Meteor.isServer) {
             }
         ]
     });
+
+    Meteor.publishComposite("pubWithChildThatShouldChangeOnUnset", {
+        find: function() {
+            return Posts.find();
+        },
+        children: [
+            {
+                find: function(post) {
+                    return Comments.find({ postId: post._id });
+                }
+            }
+        ]
+    });
 }
 
 if (Meteor.isClient) {
@@ -343,6 +356,26 @@ if (Meteor.isClient) {
             });
         }
     });
+
+    testPublication("Should remove field form minimongo when $unset is called.", {
+        publication: "pubWithChildThatShouldChangeOnUnset",
+
+        testHandler: function(assert, onComplete) {
+            var albertsPost = Posts.findOne({ author: "albert" });
+            var comment = Comments.findOne({ postId: albertsPost._id });
+
+            assert.isTrue(!!comment.text, "Comment have text field");
+
+            Meteor.call("unsetCommentText", comment._id, function(err) {
+                assert.isUndefined(err);
+
+                comment = Comments.findOne({ postId: albertsPost._id });
+                assert.isTrue(!comment.text, "Comment no longer have text field");
+
+                onComplete();
+            });
+        }
+    });
 }
 
 
@@ -442,5 +475,10 @@ Meteor.methods({
     updateCommentAuthor: function(commentId, newAuthor) {
         console.log("calling updateCommentAuthor, commentId: " + commentId + ", newAuthor: " + newAuthor);
         Comments.update({ _id: commentId }, { $set: { author: newAuthor } });
+    },
+
+    unsetCommentText: function(commentId) {
+        console.log("calling unsetCommentText, commentId: " + commentId);
+        Comments.update({ _id: commentId }, { $unset: { text: '' } });
     }
 });
