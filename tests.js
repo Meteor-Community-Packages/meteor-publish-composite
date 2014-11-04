@@ -49,7 +49,7 @@ if (Meteor.isServer) {
                 return Posts.find({ author: username });
             },
             children: postPublicationChildren
-        }
+        };
     });
 
     Meteor.publishComposite("postsAsArticles", {
@@ -75,10 +75,37 @@ if (Meteor.isServer) {
             }
         ]
     });
+
+    Meteor.publishComposite("publishCommentAuthorsInAltClientCollection", {
+        find: function() {
+            return Posts.find();
+        },
+        children: [
+            {
+                find: function(post) {
+                    return Authors.find({ username: post.author });
+                }
+            },
+            {
+                find: function(post) {
+                    return Comments.find({ postId: post._id });
+                },
+                children: [
+                    {
+                        collectionName: "commentAuthors",
+                        find: function(comment) {
+                            return Authors.find({ username: comment.author });
+                        }
+                    }
+                ]
+            }
+        ]
+    });
 }
 
 if (Meteor.isClient) {
     Articles = new Meteor.Collection("articles");
+    CommentAuthors = new Meteor.Collection("commentAuthors");
 }
 
 
@@ -361,6 +388,20 @@ if (Meteor.isClient) {
 
                 onComplete();
             });
+        }
+    });
+
+    testPublication("Should publish authors to both Authors and CommentAuthors collections", {
+        publication: "publishCommentAuthorsInAltClientCollection",
+
+        testHandler: function(assert, onComplete) {
+            var albertAsAuthor = Authors.findOne({ username: "albert" });
+            var albertAsCommentAuthor = CommentAuthors.findOne({ username: "albert" });
+
+            assert.isTrue(typeof albertAsAuthor !== "undefined", "Albert present in Authors collection");
+            assert.isTrue(typeof albertAsCommentAuthor !== "undefined", "Albert present in CommentAuthors collection");
+
+            onComplete();
         }
     });
 }
