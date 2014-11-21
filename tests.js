@@ -277,11 +277,11 @@ if (Meteor.isClient) {
 
     testPublication("Should publish new author and remove old if comment author is changed", {
         publication: "userPosts",
-        args: [ "marie" ],
+        args: [ "albert" ],
 
         testHandler: function(assert, onComplete) {
-            var mariesSecondPost = Posts.findOne({ title: "Marie's second post" });
-            var comment = Comments.findOne({ postId: mariesSecondPost._id, author: "richard" });
+            var albertsPost = Posts.findOne({ title: "Post with one comment" });
+            var comment = Comments.findOne({ postId: albertsPost._id, author: "richard" });
 
             assert.equal(Authors.find({ "username": "richard" }).count(), 1, "Old author present pre-change");
             assert.equal(Authors.find({ "username": "john" }).count(), 0, "New author absent pre-change");
