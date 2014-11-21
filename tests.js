@@ -15,6 +15,8 @@ Comments.allow({ insert: allow, update: allow, remove: allow });
  * Set up publications for testing
  */
 if (Meteor.isServer) {
+    Meteor.publishComposite.enableDebugLogging();
+
     var postPublicationChildren = [
         {
             find: function(post) {
@@ -339,7 +341,7 @@ if (Meteor.isClient) {
             var comments = Comments.find({ postId: mariesFirstPost._id });
 
             assert.isTrue(comments.count() === 0, "No comments published");
-            
+
             Meteor.call("updatePostAuthor", mariesFirstPost._id, "albert", function(err) {
                 assert.isUndefined(err);
 
@@ -359,7 +361,7 @@ if (Meteor.isClient) {
             var comments = Comments.find({ postId: albertsPost._id });
 
             assert.isTrue(comments.count() > 0, "Comments published");
-            
+
             Meteor.call("updatePostAuthor", albertsPost._id, "marie", function(err) {
                 assert.isUndefined(err);
 
@@ -426,11 +428,11 @@ if (Meteor.isServer) {
             }
 
             function initUsers() {
-                Authors.insert({ username: "marie" });
-                Authors.insert({ username: "albert" });
-                Authors.insert({ username: "richard" });
-                Authors.insert({ username: "stephen" });
-                Authors.insert({ username: "john" });
+                Authors.insert({ _id: new Mongo.ObjectID(), username: "marie" });
+                Authors.insert({ _id: new Mongo.ObjectID(), username: "albert" });
+                Authors.insert({ _id: new Mongo.ObjectID(), username: "richard" });
+                Authors.insert({ _id: new Mongo.ObjectID(), username: "stephen" });
+                Authors.insert({ _id: new Mongo.ObjectID(), username: "john" });
             }
 
             function initPosts() {
@@ -463,14 +465,19 @@ if (Meteor.isServer) {
             }
 
             function insertPost(title, author, comments) {
-                var postId = Posts.insert({
+                var postId = new Mongo.ObjectID();
+                var commentId, commentData;
+
+                Posts.insert({
+                    _id: postId,
                     title: title,
                     author: author
                 });
 
                 if (comments) {
                     for (var i = 0; i < comments.length; i++) {
-                        var commentData = _.extend({}, comments[i], { postId: postId });
+                        commentId = new Mongo.ObjectID();
+                        commentData = _.extend({ _id: commentId, postId: postId }, comments[i]);
 
                         Comments.insert(commentData);
                     }
