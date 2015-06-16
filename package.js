@@ -8,6 +8,7 @@ Package.describe({
 Package.on_use(function (api) {
     api.versionsFrom("METEOR@0.9.0");
     api.use("underscore", "server");
+    api.use("minimongo", "server");
     api.add_files([
         "lib/doc_ref_counter.js",
         "lib/publication.js",
