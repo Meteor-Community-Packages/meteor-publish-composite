@@ -133,6 +133,9 @@ if (Meteor.isServer) {
             }
         }
     ]);
+
+    Meteor.publishComposite('returnNothing', function() {
+    });
 }
 
 if (Meteor.isClient) {
@@ -160,7 +163,7 @@ var testPublication = function(testName, options) {
                             onComplete();
                         });
                     });
-                });
+                }, subscription);
             });
         });
 
@@ -461,6 +464,16 @@ if (Meteor.isClient) {
 
             assert.isTrue(typeof marie !== 'undefined', 'Marie present');
             assert.isTrue(typeof albert !== 'undefined', 'Albert present');
+
+            onComplete();
+        }
+    });
+
+    testPublication('Should gracefully return if publication handler returns nothing', {
+        publication: 'returnNothing',
+
+        testHandler: function(assert, onComplete, subscription) {
+            assert.isTrue(subscription.ready(), 'Subscription is ready');
 
             onComplete();
         }
