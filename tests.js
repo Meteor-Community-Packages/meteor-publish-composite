@@ -103,6 +103,36 @@ if (Meteor.isServer) {
             }
         ]
     });
+
+    Meteor.publishComposite('twoUsersPosts', function(username1, username2) {
+        return [
+            {
+                find: function() {
+                    return Posts.find({ author: username1 });
+                },
+                children: postPublicationChildren
+            },
+            {
+                find: function() {
+                    return Posts.find({ author: username2 });
+                },
+                children: postPublicationChildren
+            }
+        ];
+    });
+
+    Meteor.publishComposite('twoFixedAuthors', [
+        {
+            find: function() {
+                return Authors.find({ username: 'marie' });
+            }
+        },
+        {
+            find: function() {
+                return Authors.find({ username: 'albert' });
+            }
+        }
+    ]);
 }
 
 if (Meteor.isClient) {
@@ -402,6 +432,35 @@ if (Meteor.isClient) {
 
             assert.isTrue(typeof albertAsAuthor !== 'undefined', 'Albert present in Authors collection');
             assert.isTrue(typeof albertAsCommentAuthor !== 'undefined', 'Albert present in CommentAuthors collection');
+
+            onComplete();
+        }
+    });
+
+    testPublication('Should publish two top level publications specified with a function', {
+        publication: 'twoUsersPosts',
+        args: [ 'marie', 'albert' ],
+
+        testHandler: function(assert, onComplete) {
+            var mariesPost = Posts.findOne({ author: 'marie' });
+            var albertsPost = Posts.findOne({ author: 'albert' });
+
+            assert.isTrue(typeof mariesPost !== 'undefined', 'Marie\'s post present');
+            assert.isTrue(typeof albertsPost !== 'undefined', 'Albert\'s post present');
+
+            onComplete();
+        }
+    });
+
+    testPublication('Should publish two top level publications specifed with an array', {
+        publication: 'twoFixedAuthors',
+
+        testHandler: function(assert, onComplete) {
+            var marie = Authors.findOne({ username: 'marie' });
+            var albert = Authors.findOne({ username: 'albert' });
+
+            assert.isTrue(typeof marie !== 'undefined', 'Marie present');
+            assert.isTrue(typeof albert !== 'undefined', 'Albert present');
 
             onComplete();
         }
