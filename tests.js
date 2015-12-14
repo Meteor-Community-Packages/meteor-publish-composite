@@ -47,13 +47,56 @@ if (Meteor.isServer) {
     Meteor.publishComposite('userPosts', function(username) {
         return {
             find: function() {
-                console.log('userPosts.find() called');
                 return Posts.find({ author: username });
             },
             children: postPublicationChildren
         };
     });
+    
+    /** Start - Helpers for children depends feature ****/
+     var postPublicationChildrenWithoutCommentsChildrenDepend = function (childrenDepend){
+      return [
+        {
+            find: function(post) {
+                return Authors.find({ username: post.author });
+            }
+        },
+        {
+            find: function(post) {
+                return Comments.find({ postId: post._id });
+            },
+            childrenDepend: childrenDepend,
+            children: [
+                {
+                    find: function(comment) {
+                        return Authors.find({ username: comment.author });
+                    }
+                }
+            ]
+        }
+      ];
+    };
+    
+    Meteor.publishComposite('userPostsWithoutCommentAuthor', function(username) {
+        return {
+            find: function() {
+                return Posts.find({ author: username });
+            },
+            children: postPublicationChildrenWithoutCommentsChildrenDepend(['_id'])
+        };
+    });
+    
+    Meteor.publishComposite('userPostsWithCommentAuthor', function(username) {
+        return {
+            find: function() {
+                return Posts.find({ author: username });
+            },
+            children: postPublicationChildrenWithoutCommentsChildrenDepend(['author'])
+        };
+    });
 
+    /*** End Helpers for children depends feature ****/
+    
     Meteor.publishComposite('postsAsArticles', {
         collectionName: 'articles',
         find: function() {
@@ -331,7 +374,53 @@ if (Meteor.isClient) {
             });
         }
     });
+    
+    /*** Start - Test children depend feature ***/
+    testPublication('Children depend - Should publish new author and remove old if comment author is changed, when have children depened', {
+        publication: 'userPostsWithCommentAuthor',
+        args: [ 'albert' ],
 
+        testHandler: function(assert, onComplete) {
+            var albertsPost = Posts.findOne({ title: 'Post with one comment' });
+            var comment = Comments.findOne({ postId: albertsPost._id, author: 'richard' });
+
+            assert.equal(Authors.find({ 'username': 'richard' }).count(), 1, 'Old author present pre-change');
+            assert.equal(Authors.find({ 'username': 'john' }).count(), 0, 'New author absent pre-change');
+
+            Meteor.call('updateCommentAuthor', comment._id, 'john', function(err) {
+                assert.isUndefined(err);
+
+                assert.equal(Authors.find({ 'username': 'richard' }).count(), 0, 'Old author absent post-change');
+                assert.equal(Authors.find({ 'username': 'john' }).count(), 1, 'New author present post-change');
+
+                onComplete();
+            });
+        }
+    });
+    
+    testPublication('Children depend - Should not publish new author and remove old if comment author is changed and don\'t have children depenend', {
+        publication: 'userPostsWithoutCommentAuthor',
+        args: [ 'albert' ],
+
+        testHandler: function(assert, onComplete) {
+            var albertsPost = Posts.findOne({ title: 'Post with one comment' });
+            var comment = Comments.findOne({ postId: albertsPost._id, author: 'richard' });
+
+            assert.equal(Authors.find({ 'username': 'richard' }).count(), 1, 'Old author present pre-change');
+            assert.equal(Authors.find({ 'username': 'john' }).count(), 0, 'New author absent pre-change');
+
+            Meteor.call('updateCommentAuthor', comment._id, 'john', function(err) {
+                assert.isUndefined(err);
+      
+                assert.equal(Authors.find({ 'username': 'richard' }).count(), 1, 'Old author present post-change');
+                assert.equal(Authors.find({ 'username': 'john' }).count(), 0, 'New author absent post-change');
+
+                onComplete();
+            });
+        }
+    });
+    /*** End - Test children depend feature ***/
+    
     testPublication('Should remove post, comment, and comment author if post is deleted', {
         publication: 'userPosts',
         args: [ 'marie' ],
