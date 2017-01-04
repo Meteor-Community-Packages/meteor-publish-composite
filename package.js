@@ -19,6 +19,8 @@ Package.on_use(function (api) {
 
 Package.on_test(function(api) {
     api.use("reywood:publish-composite");
+    api.use("mongo", "server");
+    api.use("underscore", "server");
     api.use(["tinytest", "test-helpers"]);
 
     api.add_files([ "tests.js" ]);
