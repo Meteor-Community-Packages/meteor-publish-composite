@@ -177,6 +177,10 @@ var userId = 1, limit = 10;
 Meteor.subscribe('postsByUser', userId, limit);
 ```
 
+## Known issues
+
+This package is great for publishing small sets of related documents. Use this for large sets of documents with many child publications and you'll probably experience performance problems. Using this package to publish documents for a page with infinite scrolling is probably a bad idea. It's hard to offer exact numbers (i.e. don't publish more than X parent documents with Y child publications) so some experimentation may be necessary on your part to see what works for your application.
+
 ## Reporting issues/bugs
 
 If you are experiencing an issue with this package, please create a GitHub repo with the simplest possible Meteor app that demonstrates the problem. This will go a long way toward helping me to diagnose the problem.
