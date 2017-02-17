@@ -175,6 +175,10 @@ var userId = 1, limit = 10;
 Meteor.subscribe('postsByUser', userId, limit);
 ```
 
+## Reporting issues/bugs
+
+If you are experiencing an issue with this package, please create a GitHub repo with the simplest possible Meteor app that demonstrates the problem. This will go a long way toward helping me to diagnose the problem.
+
 ## More info
 
 For more info on how to use `Meteor.publishComposite`, check out these blog posts:
