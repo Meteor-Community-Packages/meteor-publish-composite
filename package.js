@@ -1,25 +1,38 @@
 Package.describe({
-    name: "reywood:publish-composite",
-    summary: "Publish a set of related documents from multiple collections with a reactive join",
-    version: "1.4.2",
-    git: "https://github.com/englue/meteor-publish-composite.git"
+    name: 'reywood:publish-composite',
+    summary: 'Publish a set of related documents from multiple collections with a reactive join',
+    version: '1.4.2',
+    git: 'https://github.com/englue/meteor-publish-composite.git',
 });
 
-Package.on_use(function (api) {
-    api.versionsFrom("METEOR@0.9.0");
-    api.use("underscore", "server");
-    api.add_files([
-        "lib/doc_ref_counter.js",
-        "lib/publication.js",
-        "lib/subscription.js",
-        "lib/publish_composite.js"
-    ], "server");
+Package.onUse((api) => {
+    api.versionsFrom('METEOR@1.4.3');
+    api.use([
+        'ecmascript',
+        'modules',
+        'underscore',
+    ], ['client', 'server']);
+    api.mainModule('lib/publish_composite.js', 'server');
+    api.addFiles([
+        'lib/doc_ref_counter.js',
+        'lib/publication.js',
+        'lib/subscription.js',
+    ], 'server');
+
+    api.export('enableDebugLogging', 'server');
 });
 
 
-Package.on_test(function(api) {
-    api.use("reywood:publish-composite");
-    api.use(["tinytest", "test-helpers"]);
+Package.onTest((api) => {
+    api.use([
+        'ecmascript',
+        'modules',
+    ], ['client', 'server']);
+    api.use([
+        'reywood:publish-composite',
+    ], 'server');
 
-    api.add_files([ "tests.js" ]);
+    api.addFiles('tests/common.js', ['client', 'server']);
+    api.addFiles('tests/client.js', 'client');
+    api.addFiles('tests/server.js', 'server');
 });
