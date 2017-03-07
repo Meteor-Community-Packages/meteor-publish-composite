@@ -6,11 +6,12 @@
         "Tinytest": true
     },
     "rules": {
+        "complexity": ["error", 5],
         "indent": ["error", 4],
         "import/prefer-default-export": 0,
         "max-len": ["error", 120],
         "no-param-reassign": 0,
-        "no-plusplus": [2, { "allowForLoopAfterthoughts": true }],
+        "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
         "no-underscore-dangle": 0,
         "no-use-before-define": ["error", { "functions": false }]
     },

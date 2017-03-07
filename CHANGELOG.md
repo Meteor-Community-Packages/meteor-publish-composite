@@ -1,4 +1,11 @@
+## v1.5.0
+
+* Update for meteor 1.4
+* Change from LGPL to MIT license
+
+
 ## v1.4.2
+
 * Merge branch 'patrickml-issue/#46'
 * Merge branch 'issue/#46' of https://github.com/patrickml/meteor-publish-composite into patrickml-issue/#46
 
