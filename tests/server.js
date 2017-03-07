@@ -6,6 +6,7 @@ import { _ } from 'meteor/underscore';
 import { enableDebugLogging } from 'meteor/reywood:publish-composite';
 
 import { Authors, Comments, Posts } from './common';
+import { debugLog } from '../lib/logging';
 
 
 enableDebugLogging();
@@ -206,6 +207,6 @@ Meteor.methods({
     })(),
 
     log: function log(message) {
-        console.log(message);
+        debugLog('client', message);
     },
 });

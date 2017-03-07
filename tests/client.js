@@ -20,9 +20,9 @@ describe('Meteor.publishComposite', () => {
             const onSubscriptionReady = function onSubscriptionReady() {
                 Meteor.call('log', 'Sub ready, starting test', () => {
                     options.testHandler((error) => {
-                        Meteor.call('log', 'stopping sub', () => {
+                        Meteor.call('log', 'Test finished, stopping sub', () => {
                             subscription.stop();
-                            Meteor.call('log', 'test complete', () => {
+                            Meteor.call('log', 'TEST COMPLETE', () => {
                                 onComplete(error);
                             });
                         });

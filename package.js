@@ -15,6 +15,7 @@ Package.onUse((api) => {
     api.mainModule('lib/publish_composite.js', 'server');
     api.addFiles([
         'lib/doc_ref_counter.js',
+        'lib/logging.js',
         'lib/publication.js',
         'lib/subscription.js',
     ], 'server');
