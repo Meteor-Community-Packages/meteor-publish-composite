@@ -18,27 +18,27 @@ Comments.allow({ insert: allow, update: allow, remove: allow });
  * Utility methods
  */
 Meteor.methods({
-    removePost: (postId) => {
+    removePost(postId) {
         console.log('calling removePost');
         Posts.remove(postId);
     },
 
-    removeComment: (commentId) => {
+    removeComment(commentId) {
         console.log('calling removeComment');
         Comments.remove(commentId);
     },
 
-    updatePostAuthor: (postId, newAuthor) => {
+    updatePostAuthor(postId, newAuthor) {
         console.log(`calling updatePostAuthor, postId: ${postId}, newAuthor: ${newAuthor}`);
         Posts.update({ _id: postId }, { $set: { author: newAuthor } });
     },
 
-    updateCommentAuthor: (commentId, newAuthor) => {
+    updateCommentAuthor(commentId, newAuthor) {
         console.log(`calling updateCommentAuthor, commentId: ${commentId}, newAuthor: ${newAuthor}`);
         Comments.update({ _id: commentId }, { $set: { author: newAuthor } });
     },
 
-    unsetCommentText: (commentId) => {
+    unsetCommentText(commentId) {
         console.log(`calling unsetCommentText, commentId: ${commentId}`);
         Comments.update({ _id: commentId }, { $unset: { text: '' } });
     },
