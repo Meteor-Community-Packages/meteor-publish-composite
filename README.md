@@ -34,19 +34,19 @@ Arguments
 
     ```javascript
     {
-        find: function() {
+        find() {
             // Must return a cursor containing top level documents
         },
         children: [
             {
-                find: function(topLevelDocument) {
+                find(topLevelDocument) {
                     // Called for each top level document. Top level document is passed
                     // in as an argument.
                     // Must return a cursor of second tier documents.
                 },
                 children: [
                     {
-                        find: function(secondTierDocument, topLevelDocument) {
+                        find(secondTierDocument, topLevelDocument) {
                             // Called for each second tier document. These find functions
                             // will receive all parent documents starting with the nearest
                             // parent and working all the way up to the top level as
@@ -60,7 +60,7 @@ Arguments
                 ]
             },
             {
-                find: function(topLevelDocument) {
+                find(topLevelDocument) {
                     // Also called for each top level document.
                     // Must return another cursor of second tier documents.
                 }
@@ -82,13 +82,13 @@ First, we'll create our publication on the server.
 import { publishComposite } from 'meteor/reywood:publish-composite';
 
 publishComposite('topTenPosts', {
-    find: function() {
+    find() {
         // Find top ten highest scoring posts
         return Posts.find({}, { sort: { score: -1 }, limit: 10 });
     },
     children: [
         {
-            find: function(post) {
+            find(post) {
                 // Find post author. Even though we only want to return
                 // one record here, we use "find" instead of "findOne"
                 // since this function should return a cursor.
@@ -98,7 +98,7 @@ publishComposite('topTenPosts', {
             }
         },
         {
-            find: function(post) {
+            find(post) {
                 // Find top two comments on post
                 return Comments.find(
                     { postId: post._id },
@@ -106,7 +106,7 @@ publishComposite('topTenPosts', {
             },
             children: [
                 {
-                    find: function(comment, post) {
+                    find(comment, post) {
                         // Find user that authored comment.
                         return Meteor.users.find(
                             { _id: comment.authorId },
@@ -141,11 +141,11 @@ Now we can use the published data in one of our templates.
 
 ```javascript
 Template.topTenPosts.helpers({
-    posts: function() {
+    posts() {
         return Posts.find();
     },
 
-    postAuthor: function() {
+    postAuthor() {
         // We use this helper inside the {{#each posts}} loop, so the context
         // will be a post object. Thus, we can use this.authorId.
         return Meteor.users.findOne(this.authorId);
@@ -163,7 +163,7 @@ import { publishComposite } from 'meteor/reywood:publish-composite';
 
 publishComposite('postsByUser', function(userId, limit) {
     return {
-        find: function() {
+        find() {
             // Find posts made by user. Note arguments for callback function
             // being used in query.
             return Posts.find({ authorId: userId }, { limit: limit });
@@ -183,7 +183,14 @@ Meteor.subscribe('postsByUser', userId, limit);
 
 ## Known issues
 
-This package is great for publishing small sets of related documents. Use this for large sets of documents with many child publications and you'll probably experience performance problems. Using this package to publish documents for a page with infinite scrolling is probably a bad idea. It's hard to offer exact numbers (i.e. don't publish more than X parent documents with Y child publications) so some experimentation may be necessary on your part to see what works for your application.
+**Avoid publishing very large sets of documents**
+
+This package is great for publishing small sets of related documents. If you use it for large sets of documents with many child publications, you'll probably experience performance problems. Using this package to publish documents for a page with infinite scrolling is probably a bad idea. It's hard to offer exact numbers (i.e. don't publish more than X parent documents with Y child publications) so some experimentation may be necessary on your part to see what works for your application.
+
+**Arrow functions**
+
+You will not be able to access `this.userId` inside your `find` functions if you use [arrow functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions).
+
 
 ## Reporting issues/bugs
 
