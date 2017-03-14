@@ -10,7 +10,7 @@ import { Authors, Comments, Posts } from './common';
 const Articles = new Mongo.Collection('articles');
 const CommentAuthors = new Mongo.Collection('commentAuthors');
 
-describe('Meteor.publishComposite', () => {
+describe('publishComposite', () => {
     /**
      * Define test helper
      */

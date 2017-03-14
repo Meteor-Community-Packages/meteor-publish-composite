@@ -1,7 +1,7 @@
 meteor-publish-composite
 ========================
 
-`Meteor.publishComposite(...)` provides a flexible way to publish a set of related documents from various collections using a reactive join. This makes it easy to publish a whole tree of documents at once. The published collections are reactive and will update when additions/changes/deletions are made.
+`publishComposite(...)` provides a flexible way to publish a set of related documents from various collections using a reactive join. This makes it easy to publish a whole tree of documents at once. The published collections are reactive and will update when additions/changes/deletions are made.
 
 This project differs from many other parent/child relationship mappers in its flexibility. The relationship between a parent and its children can be based on almost anything. For example, let's say you have a site that displays news articles. On each article page, you would like to display a list at the end containing a couple of related articles. You could use `publishComposite` to publish the primary article, scan the body for keywords which are then used to search for other articles, and publish these related articles as children. Of course, the keyword extraction and searching are up to you to implement.
 
@@ -16,9 +16,9 @@ $ meteor add reywood:publish-composite
 
 ## Usage
 
-This package defines one new Meteor function on the server:
+This package exports a function on the server:
 
-#### Meteor.publishComposite(name, options)
+#### publishComposite(name, options)
 
 Arguments
 
@@ -79,7 +79,9 @@ First, we'll create our publication on the server.
 
 ```javascript
 // Server
-Meteor.publishComposite('topTenPosts', {
+import { publishComposite } from 'meteor/reywood:publish-composite';
+
+publishComposite('topTenPosts', {
     find: function() {
         // Find top ten highest scoring posts
         return Posts.find({}, { sort: { score: -1 }, limit: 10 });
@@ -153,11 +155,13 @@ Template.topTenPosts.helpers({
 
 ### Example 2: A publication that **does** take arguments
 
-Note a function is passed for the `options` argument to `Meteor.publishComposite`.
+Note a function is passed for the `options` argument to `publishComposite`.
 
 ```javascript
 // Server
-Meteor.publishComposite('postsByUser', function(userId, limit) {
+import { publishComposite } from 'meteor/reywood:publish-composite';
+
+publishComposite('postsByUser', function(userId, limit) {
     return {
         find: function() {
             // Find posts made by user. Note arguments for callback function
@@ -187,10 +191,12 @@ If you are experiencing an issue with this package, please create a GitHub repo 
 
 ## More info
 
-For more info on how to use `Meteor.publishComposite`, check out these blog posts:
+For more info on how to use `publishComposite`, check out these blog posts:
 
 * [Publishing Reactive Joins in Meteor][blog-reactive-joins]
 * [Publishing to an Alternative Client-side Collection in Meteor][blog-collection-name]
+
+Note that these articles use the old pre-import notation, `Meteor.publishComposite`, which is still available for backward compatibility.
 
 
 [blog-reactive-joins]: http://braindump.io/meteor/2014/09/12/publishing-reactive-joins-in-meteor.html

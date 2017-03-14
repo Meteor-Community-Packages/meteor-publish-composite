@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import { _ } from 'meteor/underscore';
-import { enableDebugLogging } from 'meteor/reywood:publish-composite';
+import { enableDebugLogging, publishComposite } from 'meteor/reywood:publish-composite';
 
 import { Authors, Comments, Posts } from './common';
 import { debugLog } from '../lib/logging';
@@ -32,14 +32,14 @@ const postPublicationChildren = [
     },
 ];
 
-Meteor.publishComposite('allPosts', {
+publishComposite('allPosts', {
     find() {
         return Posts.find();
     },
     children: postPublicationChildren,
 });
 
-Meteor.publishComposite('userPosts', username => ({
+publishComposite('userPosts', username => ({
     find() {
         debugLog('userPosts', 'userPosts.find() called');
         return Posts.find({ author: username });
@@ -47,14 +47,14 @@ Meteor.publishComposite('userPosts', username => ({
     children: postPublicationChildren,
 }));
 
-Meteor.publishComposite('postsAsArticles', {
+publishComposite('postsAsArticles', {
     collectionName: 'articles',
     find() {
         return Posts.find();
     },
 });
 
-Meteor.publishComposite('pubWithChildThatReturnsNullIfAuthorIsMarie', {
+publishComposite('pubWithChildThatReturnsNullIfAuthorIsMarie', {
     find() {
         return Posts.find();
     },
@@ -71,7 +71,7 @@ Meteor.publishComposite('pubWithChildThatReturnsNullIfAuthorIsMarie', {
     ],
 });
 
-Meteor.publishComposite('publishCommentAuthorsInAltClientCollection', {
+publishComposite('publishCommentAuthorsInAltClientCollection', {
     find() {
         return Posts.find();
     },
@@ -97,7 +97,7 @@ Meteor.publishComposite('publishCommentAuthorsInAltClientCollection', {
     ],
 });
 
-Meteor.publishComposite('twoUsersPosts', (username1, username2) => [
+publishComposite('twoUsersPosts', (username1, username2) => [
     {
         find() {
             return Posts.find({ author: username1 });
@@ -112,7 +112,7 @@ Meteor.publishComposite('twoUsersPosts', (username1, username2) => [
     },
 ]);
 
-Meteor.publishComposite('twoFixedAuthors', [
+publishComposite('twoFixedAuthors', [
     {
         find() {
             return Authors.find({ username: 'marie' });
@@ -125,7 +125,7 @@ Meteor.publishComposite('twoFixedAuthors', [
     },
 ]);
 
-Meteor.publishComposite('returnNothing', () => undefined);
+publishComposite('returnNothing', () => undefined);
 
 
 /**

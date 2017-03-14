@@ -2,10 +2,10 @@ babel-compiler@6.14.1
 babel-runtime@1.0.1
 ecmascript@0.6.3
 ecmascript-runtime@0.3.15
-local-test:reywood:publish-composite@1.5.0
+local-test:reywood:publish-composite@1.5.1
 meteor@1.6.1
 modules@0.7.9
 modules-runtime@0.7.9
 promise@0.8.8
-reywood:publish-composite@1.5.0
+reywood:publish-composite@1.5.1
 underscore@1.0.10
