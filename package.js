@@ -33,7 +33,13 @@ Package.onTest((api) => {
         'modules',
     ], ['client', 'server']);
     api.use([
+        'practicalmeteor:mocha',
+        'practicalmeteor:chai'
+    ], 'client');
+    api.use([
         'reywood:publish-composite',
+        'mongo',
+        'underscore'
     ], 'server');
 
     api.addFiles('tests/common.js', ['client', 'server']);
