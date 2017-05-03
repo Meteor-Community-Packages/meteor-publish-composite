@@ -1,0 +1,28 @@
+{
+    "extends": "airbnb",
+    "globals": {
+        "Package": true,
+        "Npm": true,
+        "Tinytest": true
+    },
+    "rules": {
+        "complexity": ["error", 5],
+        "indent": ["error", 4],
+        "import/prefer-default-export": 0,
+        "max-len": ["error", 120],
+        "no-param-reassign": 0,
+        "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
+        "no-underscore-dangle": 0,
+        "no-use-before-define": ["error", { "functions": false }]
+    },
+    "settings": {
+        "import/core-modules": [
+            "meteor/meteor",
+            "meteor/mongo",
+            "meteor/underscore",
+            "meteor/practicalmeteor:mocha",
+            "meteor/practicalmeteor:chai",
+            "meteor/reywood:publish-composite"
+        ]
+    }
+}
