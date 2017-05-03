@@ -17,6 +17,7 @@
     },
     "settings": {
         "import/core-modules": [
+            "meteor/check",
             "meteor/meteor",
             "meteor/mongo",
             "meteor/underscore",

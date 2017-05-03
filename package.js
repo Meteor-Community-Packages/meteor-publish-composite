@@ -8,6 +8,7 @@ Package.describe({
 Package.onUse((api) => {
     api.versionsFrom('METEOR@1.4.3');
     api.use([
+        'check',
         'ecmascript',
         'modules',
         'underscore',
@@ -34,12 +35,12 @@ Package.onTest((api) => {
     ], ['client', 'server']);
     api.use([
         'practicalmeteor:mocha',
-        'practicalmeteor:chai'
+        'practicalmeteor:chai',
     ], 'client');
     api.use([
         'reywood:publish-composite',
         'mongo',
-        'underscore'
+        'underscore',
     ], 'server');
 
     api.addFiles('tests/common.js', ['client', 'server']);
