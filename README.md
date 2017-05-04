@@ -30,7 +30,21 @@ Arguments
 
     An object literal specifying the configuration of the composite publication **or** a function that returns said object literal. If a function is used, it will receive the arguments passed to `Meteor.subscribe('myPub', arg1, arg2, ...)` (much like the `func` argument of [`Meteor.publish`](http://docs.meteor.com/#meteor_publish)). Basically, if your publication will take **no** arguments, pass an object literal for this argument. If your publication **will** take arguments, use a function that returns an object literal.
 
-    The object literal must have a `find` property, and can optionally have `children` and `collectionName` properties. The `find` property's value must be a function that returns a **cursor** of your top level documents. The `children` property's value should be an array containing any number of object literals with this same structure. The `collectionName` property's value, if present, should be a string specifying an alternate collection name to publish the documents to (see [this blog post][blog-collection-name] for more details).
+    The object literal must have a `find` property, and can optionally have `children` and `collectionName` properties.
+
+    * **`find`** -- *function (required)*
+
+        A function that returns a MongoDB cursor (e.g., `return Meteor.users.find({ active: true });`)
+
+    * **`children`** -- *array (optional)*
+
+        An array containing any number of object literals with this same structure
+
+    * **`collectionName`** -- *string (optional)*
+
+        A string specifying an alternate collection name to publish documents to (see [this blog post][blog-collection-name] for more details)
+
+    Example:
 
     ```javascript
     {
@@ -46,6 +60,7 @@ Arguments
                 },
                 children: [
                     {
+                        collectionName: 'alt', // Docs from this find will be published to the 'alt' collection
                         find(secondTierDocument, topLevelDocument) {
                             // Called for each second tier document. These find functions
                             // will receive all parent documents starting with the nearest
