@@ -157,7 +157,7 @@ Now we can use the published data in one of our templates.
 ```javascript
 Template.topTenPosts.helpers({
     posts() {
-        return Posts.find();
+        return Posts.find({}, { sort: { score: -1 }, limit: 10 });
     },
 
     postAuthor() {
