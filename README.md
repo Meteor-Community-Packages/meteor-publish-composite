@@ -109,7 +109,7 @@ publishComposite('topTenPosts', {
                 // since this function should return a cursor.
                 return Meteor.users.find(
                     { _id: post.authorId },
-                    { limit: 1, fields: { profile: 1 } });
+                    { fields: { profile: 1 } });
             }
         },
         {
@@ -125,7 +125,7 @@ publishComposite('topTenPosts', {
                         // Find user that authored comment.
                         return Meteor.users.find(
                             { _id: comment.authorId },
-                            { limit: 1, fields: { profile: 1 } });
+                            { fields: { profile: 1 } });
                     }
                 }
             ]
