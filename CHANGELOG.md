@@ -1,3 +1,15 @@
+## v1.5.2
+
+* Fix issue #102: userId is undefined in child publications, wrap `cursor.observe` callbacks with `Meteor.bindEnvironment`
+* Publish children before publishing parents to mitigate rendering incomplete data
+* Run `check` on `options` to make it easier to troubleshoot/identify incorrect values
+
+
+## v1.5.1
+
+* Support for new ES6/ES2015 style imports
+
+
 ## v1.5.0
 
 * Update for meteor 1.4
