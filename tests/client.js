@@ -40,32 +40,6 @@ describe('publishComposite', () => {
         });
     };
 
-    const testPublicationSubscription = (testName, options, callback) => {
-        it(testName, (onComplete) => {
-            let subscription;
-            const onSubscriptionReady = function onSubscriptionReady() {
-                Meteor.call('log', 'Sub ready, starting test', () => {
-                    options.testHandler((error) => {
-                        Meteor.call('log', 'Test finished, stopping sub', () => {
-                            subscription.stop();
-                            Meteor.call('log', 'TEST COMPLETE', () => {
-                                onComplete(error);
-                            });
-                        });
-                    }, subscription);
-                });
-            };
-            const args = [options.publication].concat(options.args || []);
-
-            Meteor.call('initTestData');
-
-            Meteor.call('log', `** ${testName}: Subscribing`, () => {
-                const subscription = Meteor.subscribe(...args);
-                callback(subscription);
-            });
-        });
-    };
-
     const asyncExpect = (expectAction, onComplete) => {
         try {
             expectAction();
