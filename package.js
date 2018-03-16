@@ -6,7 +6,7 @@ Package.describe({
 });
 
 Package.onUse((api) => {
-    api.versionsFrom('METEOR@1.4.3');
+    api.versionsFrom('1.6.1');
     api.use([
         'check',
         'ecmascript',
@@ -34,7 +34,7 @@ Package.onTest((api) => {
         'modules',
     ], ['client', 'server']);
     api.use([
-        'practicalmeteor:mocha',
+        'cultofcoders:mocha',
         'practicalmeteor:chai',
     ], 'client');
     api.use([
