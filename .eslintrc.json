@@ -20,6 +20,7 @@
             "meteor/check",
             "meteor/meteor",
             "meteor/mongo",
+            "meteor/cultofcoders:mocha",
             "meteor/underscore",
             "meteor/practicalmeteor:mocha",
             "meteor/practicalmeteor:chai",
