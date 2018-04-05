@@ -2,7 +2,7 @@
 
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
-import { describe, it } from 'meteor/practicalmeteor:mocha';
+import { describe, it } from 'meteor/cultofcoders:mocha';
 import { expect } from 'meteor/practicalmeteor:chai';
 import { Authors, Comments, Posts } from './common';
 

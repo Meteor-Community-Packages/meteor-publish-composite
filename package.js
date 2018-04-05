@@ -34,7 +34,7 @@ Package.onTest((api) => {
         'modules',
     ], ['client', 'server']);
     api.use([
-        'practicalmeteor:mocha',
+        'cultofcoders:mocha',
         'practicalmeteor:chai',
     ], 'client');
     api.use([

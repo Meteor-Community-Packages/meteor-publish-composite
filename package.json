@@ -1,5 +1,8 @@
 {
   "name": "publish-composite",
+  "scripts": {
+    "test": "meteor test-packages ./ --driver-package cultofcoders:mocha"
+  },
   "devDependencies": {
     "eslint": "^3.17.0",
     "eslint-config-airbnb": "^14.1.0",
