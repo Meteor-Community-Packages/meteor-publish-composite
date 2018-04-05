@@ -1,12 +1,12 @@
 Package.describe({
     name: 'reywood:publish-composite',
     summary: 'Publish a set of related documents from multiple collections with a reactive join',
-    version: '1.5.2',
+    version: '1.6.0',
     git: 'https://github.com/englue/meteor-publish-composite.git',
 });
 
 Package.onUse((api) => {
-    api.versionsFrom('METEOR@1.4.3');
+    api.versionsFrom('1.6.1');
     api.use([
         'check',
         'ecmascript',
