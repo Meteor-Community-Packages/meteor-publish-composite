@@ -39,6 +39,17 @@ publishComposite('allPosts', {
     children: postPublicationChildren,
 });
 
+publishComposite('allPostsWithChildrenAsFunction', {
+    find() {
+        return Posts.find();
+    },
+    children: parentPost => (parentPost.author === 'albert' ? [{
+        find(post) {
+            return Authors.find({ username: post.author });
+        },
+    }] : postPublicationChildren),
+});
+
 publishComposite('userPosts', username => ({
     find() {
         debugLog('userPosts', 'userPosts.find() called');
@@ -93,6 +104,30 @@ publishComposite('publishCommentAuthorsInAltClientCollection', {
                     },
                 },
             ],
+        },
+    ],
+});
+
+publishComposite('publishCommentAuthorsWithChildrenAsFunctionMultipleLevel', {
+    find() {
+        return Posts.find();
+    },
+    children: [
+        {
+            find(post) {
+                return Authors.find({ username: post.author });
+            },
+        },
+        {
+            find(post) {
+                return Comments.find({ postId: post._id });
+            },
+            children: (parentComment, parentPost) => (parentComment.author === 'richard' ? [{
+                collectionName: 'commentAuthors',
+                find(comment) {
+                    return Authors.find({ username: comment.author });
+                },
+            }] : []),
         },
     ],
 });
