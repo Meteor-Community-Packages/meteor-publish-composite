@@ -105,6 +105,21 @@ describe('publishComposite', () => {
         },
     });
 
+    testPublication('Should publish all post comment authors with children as Function', {
+        publication: 'allPostsWithChildrenAsFunction',
+
+        testHandler: (onComplete) => {
+            const comments = Comments.find();
+
+            comments.forEach((comment) => {
+                const commentAuthor = Authors.findOne({ username: comment.author });
+                asyncExpect(() => expect(commentAuthor).to.be.defined, onComplete);
+            });
+
+            onComplete();
+        },
+    });
+
     testPublication('Should publish one user\'s posts', {
         publication: 'userPosts',
         args: ['marie'],
@@ -311,6 +326,20 @@ describe('publishComposite', () => {
 
             asyncExpect(() => expect(albertAsAuthor).to.be.defined, onComplete);
             asyncExpect(() => expect(albertAsCommentAuthor).to.be.defined, onComplete);
+
+            onComplete();
+        },
+    });
+
+    testPublication('Should publish authors to both Authors with children as Function with Multip leLevel', {
+        publication: 'publishCommentAuthorsWithChildrenAsFunctionMultipleLevel',
+
+        testHandler: (onComplete) => {
+            const marieAsAuthor = Authors.findOne({ username: 'marie' });
+            const stephenAsCommentAuthor = CommentAuthors.findOne({ username: 'stephen' });
+
+            asyncExpect(() => expect(marieAsAuthor).to.be.defined, onComplete);
+            asyncExpect(() => expect(stephenAsCommentAuthor).to.not.be.defined, onComplete);
 
             onComplete();
         },

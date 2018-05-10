@@ -36,9 +36,11 @@ Arguments
 
         A function that returns a MongoDB cursor (e.g., `return Meteor.users.find({ active: true });`)
 
-    * **`children`** -- *array (optional)*
+    * **`children`** -- *array (optional)* or *function*
 
-        An array containing any number of object literals with this same structure
+        - An array containing any number of object literals with this same structure
+        - A function with top level documents as arguments. It helps dynamically build
+        the array based on conditions ( like documents fields values)
 
     * **`collectionName`** -- *string (optional)*
 
@@ -85,6 +87,33 @@ Arguments
     }
     ```
 
+    Example with children as function:
+
+    ```javascript
+    {
+      find() {
+          return Notifications.find();
+      },
+      children(parentNotification) {
+        // children is a function that returns an array of objects.
+        // It takes parent documents as arguments and dynamically builds children array.
+        if (parentNotification.type === 'about_post') {
+          return [{
+            find(notification) {
+              return Posts.find(parentNotification.objectId);
+            }
+          }];
+        }
+        return [
+          {
+            find(notification) {
+              return Comments.find(parentNotification.objectId);
+            }
+          }
+        ]
+      }
+    }
+    ```  
 
 ## Examples
 
