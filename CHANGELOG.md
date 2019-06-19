@@ -1,3 +1,11 @@
+## v1.7.1
+
+* Handle stopping a publication early
+
+## v1.7.0
+
+* Allow `children` to be declared as a function
+
 ## v1.5.2
 
 * Fix issue #102: userId is undefined in child publications, wrap `cursor.observe` callbacks with `Meteor.bindEnvironment`
