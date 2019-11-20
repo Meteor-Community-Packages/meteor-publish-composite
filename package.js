@@ -12,7 +12,7 @@ Package.onUse((api) => {
         'ecmascript',
         'modules',
         'underscore',
-    ], ['client', 'server']);
+    ], ['server']);
     api.mainModule('lib/publish_composite.js', 'server');
     api.addFiles([
         'lib/doc_ref_counter.js',
