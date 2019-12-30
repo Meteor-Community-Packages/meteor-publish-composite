@@ -33,6 +33,16 @@
         "review",
         "test"
       ]
+    },
+    {
+      "login": "rclai",
+      "name": "Richard Lai",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1316261?v=4",
+      "profile": "https://github.com/rclai",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7
