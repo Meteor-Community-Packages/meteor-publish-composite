@@ -1,3 +1,7 @@
+## v1.7.4
+
+* Reformat code to StandardJS & add other community standards
+
 ## v1.7.3
 
 * Update dependencies
