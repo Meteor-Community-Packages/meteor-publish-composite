@@ -1,0 +1,27 @@
+{
+  "projectName": "meteor-publish-composite",
+  "projectOwner": "Meteor-Community-Packages",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "commitConvention": "eslint",
+  "contributors": [
+    {
+      "login": "reywood",
+      "name": "Sean Dwyer",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1796302?v=4",
+      "profile": "http://braindump.io",
+      "contributions": [
+        "code",
+        "doc",
+        "ideas",
+        "maintenance"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}
