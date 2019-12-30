@@ -92,6 +92,15 @@
         "maintenance",
         "tool"
       ]
+    },
+    {
+      "login": "KoenLav",
+      "name": "Koen [XII]",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/12446296?v=4",
+      "profile": "https://duodeka.nl/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7
