@@ -21,6 +21,18 @@
         "ideas",
         "maintenance"
       ]
+    },
+    {
+      "login": "sebakerckhof",
+      "name": "Seba Kerckhof",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/88471?v=4",
+      "profile": "https://github.com/sebakerckhof",
+      "contributions": [
+        "code",
+        "maintenance",
+        "review",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7
