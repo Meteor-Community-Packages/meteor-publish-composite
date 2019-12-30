@@ -43,6 +43,15 @@
         "bug",
         "code"
       ]
+    },
+    {
+      "login": "zimme",
+      "name": "Simon Fridlund",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1215414?v=4",
+      "profile": "https://github.com/zimme",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7
