@@ -5,7 +5,7 @@ meteor-publish-composite
 ![GitHub](https://img.shields.io/github/license/Meteor-Community-Packages/meteor-publish-composite)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/Meteor-Community-Packages/meteor-publish-composite.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Meteor-Community-Packages/meteor-publish-composite/context:javascript) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-8-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END --> ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/Meteor-Community-Packages/meteor-publish-composite?label=latest&sort=semver) [![](https://img.shields.io/badge/semver-2.0.0-success)](http://semver.org/spec/v2.0.0.html)
 
 `publishComposite(...)` provides a flexible way to publish a set of related documents from various collections using a reactive join. This makes it easy to publish a whole tree of documents at once. The published collections are reactive and will update when additions/changes/deletions are made.
@@ -277,6 +277,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/patrickml"><img src="https://avatars3.githubusercontent.com/u/7581369?v=4" width="100px;" alt=""/><br /><sub><b>Patrick Lewis</b></sub></a><br /><a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/commits?author=patrickml" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/nabiltntn"><img src="https://avatars1.githubusercontent.com/u/223719?v=4" width="100px;" alt=""/><br /><sub><b>nabiltntn</b></sub></a><br /><a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/commits?author=nabiltntn" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/czeslaaw"><img src="https://avatars2.githubusercontent.com/u/1939060?v=4" width="100px;" alt=""/><br /><sub><b>Krzysztof Czech</b></sub></a><br /><a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/commits?author=czeslaaw" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/StorytellerCZ"><img src="https://avatars2.githubusercontent.com/u/1715235?v=4" width="100px;" alt=""/><br /><sub><b>Jan Dvorak</b></sub></a><br /><a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/commits?author=StorytellerCZ" title="Code">💻</a> <a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/commits?author=StorytellerCZ" title="Documentation">📖</a> <a href="#infra-StorytellerCZ" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-StorytellerCZ" title="Maintenance">🚧</a> <a href="#tool-StorytellerCZ" title="Tools">🔧</a></td>
   </tr>
 </table>
 
