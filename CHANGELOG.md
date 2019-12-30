@@ -1,3 +1,13 @@
+## v1.7.3
+
+* Update dependencies
+* Do not publish to client
+
+## v1.7.2
+
+* Add test target to makefile
+* Revert the changes from "Handle stopping a publication early [#121](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/121)
+
 ## v1.7.1
 
 * Handle stopping a publication early
