@@ -1,26 +1,50 @@
+/* globals Package */
 Package.describe({
-    name: "okland:publish-composite",
-    summary: "Publish a set of related documents from multiple collections with a reactive join",
-    version: "1.4.2",
-    git: "https://github.com/englue/meteor-publish-composite.git"
-});
+  name: 'reywood:publish-composite',
+  summary: 'Publish a set of related documents from multiple collections with a reactive join',
+  version: '1.7.4',
+  git: 'https://github.com/Meteor-Community-Packages/meteor-publish-composite'
+})
 
-Package.on_use(function (api) {
-    api.versionsFrom("METEOR@0.9.0");
-    api.use(["underscore", "diff-sequence"], "server");
-    api.add_files([
-        "lib/doc_ref_counter.js",
-        "lib/publication.js",
-        "lib/subscription.js",
-        "lib/publish_composite.js"
-    ], "server");
-});
+Package.onUse((api) => {
+  api.versionsFrom('1.8.3')
+  api.use([
+    'check',
+    'ecmascript',
+    'modules',
+    'underscore',
+    'diff-sequence'
+  ], ['server'])
+  api.mainModule('lib/publish_composite.js', 'server')
+  api.addFiles([
+    'lib/doc_ref_counter.js',
+    'lib/logging.js',
+    'lib/publication.js',
+    'lib/subscription.js'
+  ], 'server')
 
+  api.export([
+    'enableDebugLogging',
+    'publishComposite'
+  ], 'server')
+})
 
-Package.on_test(function(api) {
-    api.use("okland:publish-composite");
-    api.imply(["mongo", "ddp-client", "ddp-server","underscore"]);
-    api.use(["tinytest", "test-helpers"]);
+Package.onTest((api) => {
+  api.use([
+    'ecmascript',
+    'modules'
+  ], ['client', 'server'])
+  api.use([
+    'cultofcoders:mocha',
+    'practicalmeteor:chai'
+  ], 'client')
+  api.use([
+    'reywood:publish-composite',
+    'mongo',
+    'underscore'
+  ], 'server')
 
-    api.add_files([ "tests.js" ]);
-});
+  api.addFiles('tests/common.js', ['client', 'server'])
+  api.addFiles('tests/client.js', 'client')
+  api.addFiles('tests/server.js', 'server')
+})

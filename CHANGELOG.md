@@ -1,4 +1,45 @@
+## v1.7.4
+
+* Reformat code to StandardJS & add other community standards
+
+## v1.7.3
+
+* Update dependencies
+* Do not publish to client
+
+## v1.7.2
+
+* Add test target to makefile
+* Revert the changes from "Handle stopping a publication early [#121](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/121)
+
+## v1.7.1
+
+* Handle stopping a publication early
+
+## v1.7.0
+
+* Allow `children` to be declared as a function
+
+## v1.5.2
+
+* Fix issue #102: userId is undefined in child publications, wrap `cursor.observe` callbacks with `Meteor.bindEnvironment`
+* Publish children before publishing parents to mitigate rendering incomplete data
+* Run `check` on `options` to make it easier to troubleshoot/identify incorrect values
+
+
+## v1.5.1
+
+* Support for new ES6/ES2015 style imports
+
+
+## v1.5.0
+
+* Update for meteor 1.4
+* Change from LGPL to MIT license
+
+
 ## v1.4.2
+
 * Merge branch 'patrickml-issue/#46'
 * Merge branch 'issue/#46' of https://github.com/patrickml/meteor-publish-composite into patrickml-issue/#46
 

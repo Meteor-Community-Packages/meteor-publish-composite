@@ -1,0 +1,107 @@
+{
+  "projectName": "meteor-publish-composite",
+  "projectOwner": "Meteor-Community-Packages",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "commitConvention": "eslint",
+  "contributors": [
+    {
+      "login": "reywood",
+      "name": "Sean Dwyer",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1796302?v=4",
+      "profile": "http://braindump.io",
+      "contributions": [
+        "code",
+        "doc",
+        "ideas",
+        "maintenance"
+      ]
+    },
+    {
+      "login": "sebakerckhof",
+      "name": "Seba Kerckhof",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/88471?v=4",
+      "profile": "https://github.com/sebakerckhof",
+      "contributions": [
+        "code",
+        "maintenance",
+        "review",
+        "test"
+      ]
+    },
+    {
+      "login": "rclai",
+      "name": "Richard Lai",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1316261?v=4",
+      "profile": "https://github.com/rclai",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "zimme",
+      "name": "Simon Fridlund",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1215414?v=4",
+      "profile": "https://github.com/zimme",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "patrickml",
+      "name": "Patrick Lewis",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/7581369?v=4",
+      "profile": "https://github.com/patrickml",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "nabiltntn",
+      "name": "nabiltntn",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/223719?v=4",
+      "profile": "https://github.com/nabiltntn",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "czeslaaw",
+      "name": "Krzysztof Czech",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1939060?v=4",
+      "profile": "https://github.com/czeslaaw",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "StorytellerCZ",
+      "name": "Jan Dvorak",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1715235?v=4",
+      "profile": "https://github.com/StorytellerCZ",
+      "contributions": [
+        "code",
+        "doc",
+        "infra",
+        "maintenance",
+        "tool"
+      ]
+    },
+    {
+      "login": "KoenLav",
+      "name": "Koen [XII]",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/12446296?v=4",
+      "profile": "https://duodeka.nl/",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}
