@@ -1,10 +1,36 @@
 {
   "name": "publish-composite",
+  "version": "1.7.4",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Meteor-Community-Packages/meteor-publish-composite.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Meteor-Community-Packages/meteor-publish-composite/issues"
+  },
+  "homepage": "https://github.com/Meteor-Community-Packages/meteor-publish-composite#readme",
+  "scripts": {
+    "test": "npm run lint && meteor test-packages ./ --driver-package cultofcoders:mocha",
+    "lint": "./node_modules/.bin/standard --fix",
+    "publish": "meteor npm i && npm prune --production && meteor publish && meteor npm i",
+    "all-contributors": "./node_modules/.bin/all-contributors",
+    "all-contributors-generate": "./node_modules/.bin/all-contributors generate"
+  },
+  "readme": "README.md",
+  "license": "MIT",
+  "standard": {
+    "parser": "babel-eslint"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "bash preCommit.sh && npm run all-contributors-generate"
+    }
+  },
   "devDependencies": {
-    "eslint": "^3.17.0",
-    "eslint-config-airbnb": "^14.1.0",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jsx-a11y": "^4.0.0",
-    "eslint-plugin-react": "^6.10.0"
+    "all-contributors-cli": "^6.15.0",
+    "babel-eslint": "^10.1.0",
+    "husky": "^4.2.5",
+    "standard": "^14.3.4"
   }
 }

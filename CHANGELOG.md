@@ -1,3 +1,25 @@
+## v1.7.4
+
+* Reformat code to StandardJS & add other community standards
+
+## v1.7.3
+
+* Update dependencies
+* Do not publish to client
+
+## v1.7.2
+
+* Add test target to makefile
+* Revert the changes from "Handle stopping a publication early [#121](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/121)
+
+## v1.7.1
+
+* Handle stopping a publication early
+
+## v1.7.0
+
+* Allow `children` to be declared as a function
+
 ## v1.5.2
 
 * Fix issue #102: userId is undefined in child publications, wrap `cursor.observe` callbacks with `Meteor.bindEnvironment`

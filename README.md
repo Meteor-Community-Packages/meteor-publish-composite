@@ -1,6 +1,16 @@
 meteor-publish-composite
 ========================
 
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+![GitHub](https://img.shields.io/github/license/Meteor-Community-Packages/meteor-publish-composite)
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/Meteor-Community-Packages/meteor-publish-composite.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Meteor-Community-Packages/meteor-publish-composite/context:javascript)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/Meteor-Community-Packages/meteor-publish-composite?label=latest&sort=semver)
+[![](https://img.shields.io/badge/semver-2.0.0-success)](http://semver.org/spec/v2.0.0.html) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
+
+
 `publishComposite(...)` provides a flexible way to publish a set of related documents from various collections using a reactive join. This makes it easy to publish a whole tree of documents at once. The published collections are reactive and will update when additions/changes/deletions are made.
 
 This project differs from many other parent/child relationship mappers in its flexibility. The relationship between a parent and its children can be based on almost anything. For example, let's say you have a site that displays news articles. On each article page, you would like to display a list at the end containing a couple of related articles. You could use `publishComposite` to publish the primary article, scan the body for keywords which are then used to search for other articles, and publish these related articles as children. Of course, the keyword extraction and searching are up to you to implement.
@@ -36,9 +46,11 @@ Arguments
 
         A function that returns a MongoDB cursor (e.g., `return Meteor.users.find({ active: true });`)
 
-    * **`children`** -- *array (optional)*
+    * **`children`** -- *array (optional)* or *function*
 
-        An array containing any number of object literals with this same structure
+        - An array containing any number of object literals with this same structure
+        - A function with top level documents as arguments. It helps dynamically build
+        the array based on conditions ( like documents fields values)
 
     * **`collectionName`** -- *string (optional)*
 
@@ -85,6 +97,33 @@ Arguments
     }
     ```
 
+    Example with children as function:
+
+    ```javascript
+    {
+      find() {
+          return Notifications.find();
+      },
+      children(parentNotification) {
+        // children is a function that returns an array of objects.
+        // It takes parent documents as arguments and dynamically builds children array.
+        if (parentNotification.type === 'about_post') {
+          return [{
+            find(notification) {
+              return Posts.find(parentNotification.objectId);
+            }
+          }];
+        }
+        return [
+          {
+            find(notification) {
+              return Comments.find(parentNotification.objectId);
+            }
+          }
+        ]
+      }
+    }
+    ```
 
 ## Examples
 
@@ -223,3 +262,33 @@ Note that these articles use the old pre-import notation, `Meteor.publishComposi
 
 [blog-reactive-joins]: http://braindump.io/meteor/2014/09/12/publishing-reactive-joins-in-meteor.html
 [blog-collection-name]: http://braindump.io/meteor/2014/09/20/publishing-to-an-alternative-clientside-collection-in-meteor.html
+
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="http://braindump.io"><img src="https://avatars3.githubusercontent.com/u/1796302?v=4" width="100px;" alt=""/><br /><sub><b>Sean Dwyer</b></sub></a><br /><a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/commits?author=reywood" title="Code">💻</a> <a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/commits?author=reywood" title="Documentation">📖</a> <a href="#ideas-reywood" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-reywood" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://github.com/sebakerckhof"><img src="https://avatars0.githubusercontent.com/u/88471?v=4" width="100px;" alt=""/><br /><sub><b>Seba Kerckhof</b></sub></a><br /><a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/commits?author=sebakerckhof" title="Code">💻</a> <a href="#maintenance-sebakerckhof" title="Maintenance">🚧</a> <a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/pulls?q=is%3Apr+reviewed-by%3Asebakerckhof" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/commits?author=sebakerckhof" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://github.com/rclai"><img src="https://avatars0.githubusercontent.com/u/1316261?v=4" width="100px;" alt=""/><br /><sub><b>Richard Lai</b></sub></a><br /><a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/issues?q=author%3Arclai" title="Bug reports">🐛</a> <a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/commits?author=rclai" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/zimme"><img src="https://avatars3.githubusercontent.com/u/1215414?v=4" width="100px;" alt=""/><br /><sub><b>Simon Fridlund</b></sub></a><br /><a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/commits?author=zimme" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/patrickml"><img src="https://avatars3.githubusercontent.com/u/7581369?v=4" width="100px;" alt=""/><br /><sub><b>Patrick Lewis</b></sub></a><br /><a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/commits?author=patrickml" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/nabiltntn"><img src="https://avatars1.githubusercontent.com/u/223719?v=4" width="100px;" alt=""/><br /><sub><b>nabiltntn</b></sub></a><br /><a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/commits?author=nabiltntn" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/czeslaaw"><img src="https://avatars2.githubusercontent.com/u/1939060?v=4" width="100px;" alt=""/><br /><sub><b>Krzysztof Czech</b></sub></a><br /><a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/commits?author=czeslaaw" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/StorytellerCZ"><img src="https://avatars2.githubusercontent.com/u/1715235?v=4" width="100px;" alt=""/><br /><sub><b>Jan Dvorak</b></sub></a><br /><a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/commits?author=StorytellerCZ" title="Code">💻</a> <a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/commits?author=StorytellerCZ" title="Documentation">📖</a> <a href="#infra-StorytellerCZ" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-StorytellerCZ" title="Maintenance">🚧</a> <a href="#tool-StorytellerCZ" title="Tools">🔧</a></td>
+    <td align="center"><a href="https://duodeka.nl/"><img src="https://avatars2.githubusercontent.com/u/12446296?v=4" width="100px;" alt=""/><br /><sub><b>Koen [XII]</b></sub></a><br /><a href="https://github.com/Meteor-Community-Packages/meteor-publish-composite/commits?author=KoenLav" title="Code">💻</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-enable -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
