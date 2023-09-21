@@ -62,6 +62,17 @@ describe('publishComposite', () => {
     }
   })
 
+  testPublication('Should publish all posts via async callback', {
+    publication: 'allPostsAsync',
+
+    testHandler: (onComplete) => {
+      const posts = Posts.find()
+      asyncExpect(() => expect(posts.count()).to.equal(4), onComplete)
+
+      onComplete()
+    }
+  })
+
   testPublication('Should publish all post authors', {
     publication: 'allPosts',
 

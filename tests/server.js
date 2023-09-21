@@ -38,6 +38,15 @@ publishComposite('allPosts', {
   children: postPublicationChildren
 })
 
+publishComposite('allPostsAsync', async ()=> {
+  return {
+    find () {
+      return Posts.find()
+    },
+    children: postPublicationChildren
+  }
+})
+
 publishComposite('allPostsWithChildrenAsFunction', {
   find () {
     return Posts.find()
