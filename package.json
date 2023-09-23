@@ -13,7 +13,7 @@
   "scripts": {
     "test": "npm run lint && meteor test-packages ./ --driver-package cultofcoders:mocha",
     "lint": "./node_modules/.bin/standard --fix",
-    "publish": "meteor npm i && npm prune --production && meteor publish && meteor npm i",
+    "publish": "npm prune --production && meteor publish && meteor npm i",
     "all-contributors": "./node_modules/.bin/all-contributors",
     "all-contributors-generate": "./node_modules/.bin/all-contributors generate"
   },

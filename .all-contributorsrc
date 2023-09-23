@@ -18,8 +18,7 @@
       "contributions": [
         "code",
         "doc",
-        "ideas",
-        "maintenance"
+        "ideas"
       ]
     },
     {
@@ -29,7 +28,6 @@
       "profile": "https://github.com/sebakerckhof",
       "contributions": [
         "code",
-        "maintenance",
         "review",
         "test"
       ]
