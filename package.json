@@ -30,7 +30,7 @@
   "devDependencies": {
     "all-contributors-cli": "^6.26.1",
     "babel-eslint": "^10.1.0",
-    "husky": "^4.3.8",
-    "standard": "^14.3.4"
+    "husky": "^8.0.3",
+    "standard": "^17.1.0"
   }
 }
