@@ -1,6 +1,7 @@
 ## v1.x.x
 
 * Update dev dependencies [@storytellercz](https://github.com/sponsors/StorytellerCZ)
+* Add installation compatibility with Meteor `3.0-alpha.15` [@storytellercz](https://github.com/sponsors/StorytellerCZ)
 
 ## v1.8.0
 
