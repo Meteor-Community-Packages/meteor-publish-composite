@@ -340,7 +340,7 @@ describe('publishComposite', () => {
     }
   })
 
-  testPublication('Should publish authors to both Authors with children as Function with Multip leLevel', {
+  testPublication('Should publish authors to both Authors with children as Function with Multiple Level', {
     publication: 'publishCommentAuthorsWithChildrenAsFunctionMultipleLevel',
 
     testHandler: (onComplete) => {
@@ -369,7 +369,7 @@ describe('publishComposite', () => {
     }
   })
 
-  testPublication('Should publish two top level publications specifed with an array', {
+  testPublication('Should publish two top level publications specified with an array', {
     publication: 'twoFixedAuthors',
 
     testHandler: (onComplete) => {

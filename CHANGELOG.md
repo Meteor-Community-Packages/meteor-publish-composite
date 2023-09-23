@@ -1,3 +1,8 @@
+## v1.8.0
+
+* Allow to pass async function to publishComposite [PR](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/156) [@alisnic](https://github.com/alisnic)
+* Added Meteor v2.8.1 as an additional minimum build target [@storytellercz](https://github.com/sponsors/StorytellerCZ)
+
 ## v1.7.4
 
 * Reformat code to StandardJS & add other community standards
