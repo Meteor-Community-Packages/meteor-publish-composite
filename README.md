@@ -235,6 +235,31 @@ var userId = 1, limit = 10;
 Meteor.subscribe('postsByUser', userId, limit);
 ```
 
+### Example 3: A publication from async function
+
+Note a function is passed for the `options` argument to `publishComposite`.
+
+```javascript
+// Server
+import { publishComposite } from 'meteor/reywood:publish-composite';
+
+publishComposite('postsByUser', async function(userId) {
+    const user = await Users.findOneAsync(userId)
+    const limit = user.limit
+
+    return {
+        find() {
+            // Find posts made by user. Note arguments for callback function
+            // being used in query.
+            return Posts.find({ authorId: userId }, { limit: limit });
+        },
+        children: [
+            // This section will be similar to that of the previous example.
+        ]
+    }
+});
+```
+
 ## Known issues
 
 **Avoid publishing very large sets of documents**
