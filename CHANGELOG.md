@@ -1,4 +1,8 @@
-## v1.x.x
+## v1.8.2
+
+* Find and children async [PR](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/160) [@aboire](https://github.com/aboire)
+
+## v1.8.1
 
 * Update dev dependencies [@storytellercz](https://github.com/sponsors/StorytellerCZ)
 * Add installation compatibility with Meteor `3.0-alpha.15` [@storytellercz](https://github.com/sponsors/StorytellerCZ)
