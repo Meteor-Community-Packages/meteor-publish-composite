@@ -242,8 +242,7 @@ function insertPost (title, author, comments) {
   if (comments) {
     for (let i = 0; i < comments.length; i++) {
       commentId = new Mongo.ObjectID()
-      commentData = _.extend({ _id: commentId, postId }, comments[i])
-
+      commentData = Object.assign({ _id: commentId, postId }, comments[i])
       Comments.insert(commentData)
     }
   }
