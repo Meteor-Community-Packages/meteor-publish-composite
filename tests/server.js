@@ -1,6 +1,5 @@
 import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
-import { _ } from 'meteor/underscore'
 import { enableDebugLogging, publishComposite } from 'meteor/reywood:publish-composite'
 
 import { Authors, Comments, Posts } from './common'
