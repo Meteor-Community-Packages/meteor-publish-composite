@@ -31,6 +31,8 @@
   "devDependencies": {
     "all-contributors-cli": "^6.26.1",
     "babel-eslint": "^10.1.0",
+    "chai": "^4.3.10",
+    "chai-as-promised": "^7.1.1",
     "husky": "^8.0.3",
     "lodash.isequal": "^4.5.0",
     "standard": "^17.1.0"

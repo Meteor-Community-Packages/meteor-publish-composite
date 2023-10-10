@@ -43,8 +43,7 @@ Package.onTest((api) => {
   ], 'client')
   api.use([
     'reywood:publish-composite',
-    'mongo',
-    'underscore'
+    'mongo'
   ], 'server')
 
   api.addFiles('tests/common.js', ['client', 'server'])

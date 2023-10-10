@@ -3,8 +3,11 @@
 import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
 import { describe, it } from 'meteor/cultofcoders:mocha'
-import { expect } from 'meteor/practicalmeteor:chai'
+import chai, { expect } from 'chai'
+import chaiAsPromised from 'chai-as-promised'
 import { Authors, Comments, Posts } from './common'
+
+chai.use(chaiAsPromised)
 
 const Articles = new Mongo.Collection('articles')
 const CommentAuthors = new Mongo.Collection('commentAuthors')
