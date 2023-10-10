@@ -11,7 +11,8 @@
   },
   "homepage": "https://github.com/Meteor-Community-Packages/meteor-publish-composite#readme",
   "scripts": {
-    "test": "npm run lint && meteor test-packages ./ --driver-package cultofcoders:mocha",
+    "test": "npm run lint && npm run test:package",
+    "test:package": "meteor test-packages ./ --driver-package cultofcoders:mocha",
     "lint": "./node_modules/.bin/standard --fix",
     "publish": "npm prune --production && meteor publish && meteor npm i",
     "all-contributors": "./node_modules/.bin/all-contributors",

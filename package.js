@@ -7,7 +7,7 @@ Package.describe({
 })
 
 Npm.depends({
-    "lodash.isequal": "^4.5.0"
+  "lodash.isequal": "4.5.0"
 })
 
 Package.onUse((api) => {
@@ -16,7 +16,7 @@ Package.onUse((api) => {
     'check',
     'ecmascript',
     'modules',
-    'underscore'
+    'logging'
   ], ['server'])
   api.mainModule('lib/publish_composite.js', 'server')
   api.addFiles([
