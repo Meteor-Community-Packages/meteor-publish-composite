@@ -2,7 +2,7 @@
 Package.describe({
   name: 'reywood:publish-composite',
   summary: 'Publish a set of related documents from multiple collections with a reactive join.',
-  version: '1.8.2',
+  version: '1.8.3',
   git: 'https://github.com/Meteor-Community-Packages/meteor-publish-composite'
 })
 

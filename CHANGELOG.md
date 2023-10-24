@@ -2,6 +2,15 @@
 
 * Find and children async [PR](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/160) [@aboire](https://github.com/aboire)
 
+## v1.8.3
+
+* Fix an issue with improper use of `Object.entries` instead of `Object.values` [@storytellercz](https://github.com/sponsors/StorytellerCZ)
+* Replace underscore/lodash references in _.any() and _.isequal() with natives [PR](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/162) [@Nandika-A](https://github.com/Nandika-A)
+
+## v1.8.2
+
+* Find and children async [PR](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/160) [@aboire](https://github.com/aboire)
+
 ## v1.8.1
 
 * Update dev dependencies [@storytellercz](https://github.com/sponsors/StorytellerCZ)
