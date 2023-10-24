@@ -21,7 +21,12 @@
   "readme": "README.md",
   "license": "MIT",
   "standard": {
-    "parser": "babel-eslint"
+    "parser": "@babel/eslint-parser",
+    "ignore": [
+      "/.npm/",
+      "/node_modules/",
+      "package.js"
+    ]
   },
   "husky": {
     "hooks": {
@@ -29,8 +34,10 @@
     }
   },
   "devDependencies": {
+    "@babel/core": "^7.23.2",
+    "@babel/eslint-parser": "^7.22.15",
+    "@babel/preset-env": "^7.23.2",
     "all-contributors-cli": "^6.26.1",
-    "babel-eslint": "^10.1.0",
     "husky": "^8.0.3",
     "lodash.isequal": "^4.5.0",
     "standard": "^17.1.0"
