@@ -58,8 +58,10 @@ describe('publishComposite', () => {
     publication: 'allPosts',
 
     testHandler: (onComplete) => {
-      const posts = Posts.find()
-      asyncExpect(() => expect(posts.count()).to.equal(4), onComplete)
+      // const posts = Posts.find()
+      // asyncExpect(() => expect(posts.count()).to.equal(4), onComplete)
+
+      expect(Posts.countDocuments()).to.eventually.equal(4)
 
       onComplete()
     }
@@ -69,8 +71,10 @@ describe('publishComposite', () => {
     publication: 'allPostsAsync',
 
     testHandler: (onComplete) => {
-      const posts = Posts.find()
-      asyncExpect(() => expect(posts.count()).to.equal(4), onComplete)
+      // const posts = Posts.find()
+      // asyncExpect(() => expect(posts.count()).to.equal(4), onComplete)
+
+      expect(Posts.countDocuments()).to.eventually.equal(4)
 
       onComplete()
     }
@@ -95,8 +99,10 @@ describe('publishComposite', () => {
     publication: 'allPosts',
 
     testHandler: (onComplete) => {
-      const comments = Comments.find()
-      asyncExpect(() => expect(comments.count()).to.equal(5), onComplete)
+      // const comments = Comments.find()
+      // asyncExpect(() => expect(comments.count()).to.equal(5), onComplete)
+
+      expect(Comments.countDocuments()).to.eventually.equal(5)
 
       onComplete()
     }

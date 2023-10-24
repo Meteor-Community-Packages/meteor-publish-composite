@@ -37,7 +37,7 @@ publishComposite('allPosts', {
   children: postPublicationChildren
 })
 
-publishComposite('allPostsAsync', async ()=> {
+publishComposite('allPostsAsync', async () => {
   return {
     find () {
       return Posts.find()
@@ -50,11 +50,13 @@ publishComposite('allPostsWithChildrenAsFunction', {
   find () {
     return Posts.find()
   },
-  children: parentPost => (parentPost.author === 'albert' ? [{
-    find (post) {
-      return Authors.find({ username: post.author })
-    }
-  }] : postPublicationChildren)
+  children: parentPost => (parentPost.author === 'albert'
+    ? [{
+        find (post) {
+          return Authors.find({ username: post.author })
+        }
+      }]
+    : postPublicationChildren)
 })
 
 publishComposite('userPosts', username => ({
@@ -129,12 +131,14 @@ publishComposite('publishCommentAuthorsWithChildrenAsFunctionMultipleLevel', {
       find (post) {
         return Comments.find({ postId: post._id })
       },
-      children: (parentComment, parentPost) => (parentComment.author === 'richard' ? [{
-        collectionName: 'commentAuthors',
-        find (comment) {
-          return Authors.find({ username: comment.author })
-        }
-      }] : [])
+      children: (parentComment, parentPost) => (parentComment.author === 'richard'
+        ? [{
+            collectionName: 'commentAuthors',
+            find (comment) {
+              return Authors.find({ username: comment.author })
+            }
+          }]
+        : [])
     }
   ]
 })
