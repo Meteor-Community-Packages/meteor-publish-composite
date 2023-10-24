@@ -6,13 +6,17 @@ Package.describe({
   git: 'https://github.com/Meteor-Community-Packages/meteor-publish-composite'
 })
 
+Npm.depends({
+  "lodash.isequal": "4.5.0"
+})
+
 Package.onUse((api) => {
   api.versionsFrom(['1.8.3', '2.8.1', '3.0-alpha.15'])
   api.use([
     'check',
     'ecmascript',
     'modules',
-    'underscore'
+    'logging'
   ], ['server'])
   api.mainModule('lib/publish_composite.js', 'server')
   api.addFiles([
