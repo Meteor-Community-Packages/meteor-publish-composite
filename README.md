@@ -288,6 +288,25 @@ Note that these articles use the old pre-import notation, `Meteor.publishComposi
 [blog-reactive-joins]: http://braindump.io/meteor/2014/09/12/publishing-reactive-joins-in-meteor.html
 [blog-collection-name]: http://braindump.io/meteor/2014/09/20/publishing-to-an-alternative-clientside-collection-in-meteor.html
 
+## Alternatives
+
+While we are happy that you find this package of value, there are limitations, especially on high traffic applications.
+There are also other solutions that can solve the problems that publish-composite solves, so here is a list of possible alternatives:
+
+### MongoDB Aggregations
+
+MongoDB itself has a functionality called Aggregations which allows you to combine data from multiple collections into
+one document. It also has other useful features that you can utilize. The downside is that unless you use [reactive-aggregate](https://atmospherejs.com/tunguska/reactive-aggregate)
+package the aggregations are not reactive and things it is not the easiest to learn or master.
+
+* [Learn more](https://www.mongodb.com/docs/manual/meta/aggregation-quick-reference/)
+
+### GraphQL
+
+GraphQL allows you to specify exactly which data you need and even embed child documents. Apollo GraphQL also has an [official package]((https://atmospherejs.com/meteor/apollo))
+and there is the `apollo` starter skeleton in Meteor itself to get you started quickly.
+
+* [Official Meteor Apollo package](https://atmospherejs.com/meteor/apollo)
 
 ## Contributors ✨
 
