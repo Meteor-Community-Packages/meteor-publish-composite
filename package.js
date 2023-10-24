@@ -18,6 +18,7 @@ Package.onUse((api) => {
     'modules',
     'logging'
   ], ['server'])
+  api.use('zodern:types@1.0.9')
   api.mainModule('lib/publish_composite.js', 'server')
   api.addFiles([
     'lib/doc_ref_counter.js',
