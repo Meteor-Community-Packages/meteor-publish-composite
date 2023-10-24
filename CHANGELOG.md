@@ -1,6 +1,6 @@
-## v1.8.2
+## v1.8.4
 
-* Find and children async [PR](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/160) [@aboire](https://github.com/aboire)
+* Added basic TypeScript types [PR](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/166) [@storytellercz](https://github.com/sponsors/StorytellerCZ)
 
 ## v1.8.3
 
