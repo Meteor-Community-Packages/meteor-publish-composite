@@ -1,6 +1,8 @@
 ## v1.8.4
 
 * Added basic TypeScript types [PR](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/166) [@storytellercz](https://github.com/sponsors/StorytellerCZ)
+* Update `zodern:types` to v1.0.10 [@storytellercz](https://github.com/sponsors/StorytellerCZ)
+* Replace "for of" with "Promise.all" to keep the parallelism in _publishChildrenOf [PR](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/172) [aboire](https://github.com/aboire)
 
 ## v1.8.3
 
