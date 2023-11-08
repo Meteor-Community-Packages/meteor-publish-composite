@@ -2,7 +2,7 @@
 Package.describe({
   name: 'reywood:publish-composite',
   summary: 'Publish a set of related documents from multiple collections with a reactive join.',
-  version: '1.8.3',
+  version: '1.8.4',
   git: 'https://github.com/Meteor-Community-Packages/meteor-publish-composite'
 })
 
@@ -18,6 +18,7 @@ Package.onUse((api) => {
     'modules',
     'logging'
   ], ['server'])
+  api.use('zodern:types@1.0.10')
   api.mainModule('lib/publish_composite.js', 'server')
   api.addFiles([
     'lib/doc_ref_counter.js',

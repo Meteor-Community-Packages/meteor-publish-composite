@@ -1,6 +1,6 @@
 {
   "name": "publish-composite",
-  "version": "1.8.3",
+  "version": "1.8.4",
   "private": true,
   "repository": {
     "type": "git",
@@ -14,6 +14,7 @@
     "test": "npm run lint && npm run test:package",
     "test:package": "meteor test-packages ./ --driver-package cultofcoders:mocha",
     "lint": "./node_modules/.bin/standard --fix",
+    "lint:test": "./node_modules/.bin/standard",
     "publish": "npm prune --production && meteor publish && meteor npm i",
     "all-contributors": "./node_modules/.bin/all-contributors",
     "all-contributors-generate": "./node_modules/.bin/all-contributors generate"
