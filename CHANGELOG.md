@@ -1,5 +1,7 @@
 ## v1.8.5
 * Fixed `this.ready()` being fired too early [PR](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/174) [manueltimita](https://github.com/manueltimita)
+* Added `ddp` dependency that is needed for Meteor 3.0 and version support for Meteor `3.0-beta.0` [@storytellercz](https://github.com/sponsors/StorytellerCZ)
+* Updated `zodern:types` to v1.0.11 [@storytellercz](https://github.com/sponsors/StorytellerCZ)
 
 ## v1.8.4
 
