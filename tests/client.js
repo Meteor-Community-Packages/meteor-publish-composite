@@ -3,8 +3,12 @@
 
 import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
-import { expect } from 'chai'
+import { describe, it } from 'meteor/cultofcoders:mocha'
+import chai, { expect } from 'chai'
+import chaiAsPromised from 'chai-as-promised'
 import { Authors, Comments, Posts } from './common'
+
+chai.use(chaiAsPromised)
 
 const Articles = new Mongo.Collection('articles')
 const CommentAuthors = new Mongo.Collection('commentAuthors')
@@ -55,8 +59,10 @@ describe('publishComposite', () => {
     publication: 'allPosts',
 
     testHandler: (onComplete) => {
-      const posts = Posts.find()
-      asyncExpect(() => expect(posts.count()).to.equal(4), onComplete)
+      // const posts = Posts.find()
+      // asyncExpect(() => expect(posts.count()).to.equal(4), onComplete)
+
+      expect(Posts.countDocuments()).to.eventually.equal(4)
 
       onComplete()
     }
@@ -66,8 +72,10 @@ describe('publishComposite', () => {
     publication: 'allPostsAsync',
 
     testHandler: (onComplete) => {
-      const posts = Posts.find()
-      asyncExpect(() => expect(posts.count()).to.equal(4), onComplete)
+      // const posts = Posts.find()
+      // asyncExpect(() => expect(posts.count()).to.equal(4), onComplete)
+
+      expect(Posts.countDocuments()).to.eventually.equal(4)
 
       onComplete()
     }
@@ -92,8 +100,10 @@ describe('publishComposite', () => {
     publication: 'allPosts',
 
     testHandler: (onComplete) => {
-      const comments = Comments.find()
-      asyncExpect(() => expect(comments.count()).to.equal(5), onComplete)
+      // const comments = Comments.find()
+      // asyncExpect(() => expect(comments.count()).to.equal(5), onComplete)
+
+      expect(Comments.countDocuments()).to.eventually.equal(5)
 
       onComplete()
     }
