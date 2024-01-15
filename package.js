@@ -1,4 +1,4 @@
-/* globals Package */
+/* globals Package Npm */
 Package.describe({
   name: 'reywood:publish-composite',
   summary: 'Publish a set of related documents from multiple collections with a reactive join.',
