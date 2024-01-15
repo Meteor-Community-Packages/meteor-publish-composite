@@ -6,11 +6,10 @@ Package.describe({
   git: 'https://github.com/Meteor-Community-Packages/meteor-publish-composite'
 })
 
-Npm.depends({
-  "lodash.isequal": "4.5.0"
-})
-
 Package.onUse((api) => {
+  Npm.depends({
+    'lodash.isequal': '4.5.0'
+  })
   api.versionsFrom(['1.8.3', '2.8.1', '3.0-beta.0'])
   api.use([
     'check',
@@ -34,18 +33,22 @@ Package.onUse((api) => {
   ], 'server')
 })
 
+// meteor test-packages reywood:publish-composite --driver-package meteortesting:mocha
 Package.onTest((api) => {
+  Npm.depends({
+    'lodash.isequal': '4.5.0',
+    chai: '5.0.0'
+  })
   api.use([
     'ecmascript',
-    'modules'
+    'modules',
+    'mongo'
   ], ['client', 'server'])
   api.use([
-    'cultofcoders:mocha',
-    'practicalmeteor:chai'
+    'meteortesting:mocha-core@8.2.0-beta300.0'
   ], 'client')
   api.use([
     'reywood:publish-composite',
-    'mongo',
     'underscore'
   ], 'server')
 
