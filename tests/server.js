@@ -52,10 +52,10 @@ publishComposite('allPostsWithChildrenAsFunction', {
   },
   children: parentPost => (parentPost.author === 'albert'
     ? [{
-      find (post) {
-        return Authors.find({ username: post.author })
-      }
-    }]
+        find (post) {
+          return Authors.find({ username: post.author })
+        }
+      }]
     : postPublicationChildren)
 })
 
@@ -133,11 +133,11 @@ publishComposite('publishCommentAuthorsWithChildrenAsFunctionMultipleLevel', {
       },
       children: (parentComment, parentPost) => (parentComment.author === 'richard'
         ? [{
-          collectionName: 'commentAuthors',
-          find (comment) {
-            return Authors.find({ username: comment.author })
-          }
-        }]
+            collectionName: 'commentAuthors',
+            find (comment) {
+              return Authors.find({ username: comment.author })
+            }
+          }]
         : [])
     }
   ]
@@ -173,7 +173,6 @@ publishComposite('twoFixedAuthors', [
 
 publishComposite('returnNothing', () => undefined)
 
-
 // TODO: when the method returns on the client, in some cases
 //  the subscription still has old data in it, which makes some
 //  tests fail. The problem is that they are nonetheless still
@@ -181,9 +180,7 @@ publishComposite('returnNothing', () => undefined)
 //  predictable in the frontend, using Tracker or observeChanges
 const sleep = async function (ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
-};
-
-
+}
 
 /**
  * Utility methods
@@ -263,7 +260,6 @@ async function insertPost (title, author, comments) {
     }
   }
 }
-
 
 /**
  * Utility methods
