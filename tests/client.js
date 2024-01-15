@@ -3,7 +3,6 @@
 
 import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
-import { describe, it } from 'meteor/cultofcoders:mocha'
 import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { Authors, Comments, Posts } from './common'
