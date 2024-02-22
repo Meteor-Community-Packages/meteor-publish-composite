@@ -1,10 +1,13 @@
+/* global describe, it */
 /* eslint-disable no-unused-expressions */
 
 import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
-import { describe, it } from 'meteor/cultofcoders:mocha'
-import { expect } from 'meteor/practicalmeteor:chai'
+import chai, { expect } from 'chai'
+import chaiAsPromised from 'chai-as-promised'
 import { Authors, Comments, Posts } from './common'
+
+chai.use(chaiAsPromised)
 
 const Articles = new Mongo.Collection('articles')
 const CommentAuthors = new Mongo.Collection('commentAuthors')
@@ -31,10 +34,10 @@ describe('publishComposite', () => {
       const args = [options.publication].concat(options.args || [])
       args.push(onSubscriptionReady)
 
-      Meteor.call('initTestData')
-
-      Meteor.call('log', `** ${testName}: Subscribing`, () => {
-        subscription = Meteor.subscribe(...args)
+      Meteor.call('initTestData', () => {
+        Meteor.call('log', `** ${testName}: Subscribing`, () => {
+          subscription = Meteor.subscribe(...args)
+        })
       })
     })
   }
@@ -55,8 +58,10 @@ describe('publishComposite', () => {
     publication: 'allPosts',
 
     testHandler: (onComplete) => {
-      const posts = Posts.find()
-      asyncExpect(() => expect(posts.count()).to.equal(4), onComplete)
+      // const posts = Posts.find()
+      // asyncExpect(() => expect(posts.count()).to.equal(4), onComplete)
+
+      expect(Posts.countDocuments()).to.eventually.equal(4)
 
       onComplete()
     }
@@ -66,8 +71,10 @@ describe('publishComposite', () => {
     publication: 'allPostsAsync',
 
     testHandler: (onComplete) => {
-      const posts = Posts.find()
-      asyncExpect(() => expect(posts.count()).to.equal(4), onComplete)
+      // const posts = Posts.find()
+      // asyncExpect(() => expect(posts.count()).to.equal(4), onComplete)
+
+      expect(Posts.countDocuments()).to.eventually.equal(4)
 
       onComplete()
     }
@@ -81,7 +88,7 @@ describe('publishComposite', () => {
 
       posts.forEach((post) => {
         const postAuthor = Authors.findOne({ username: post.author })
-        asyncExpect(() => expect(postAuthor).to.be.defined, onComplete)
+        asyncExpect(() => expect(postAuthor).to.not.be.undefined, onComplete)
       })
 
       onComplete()
@@ -92,8 +99,10 @@ describe('publishComposite', () => {
     publication: 'allPosts',
 
     testHandler: (onComplete) => {
-      const comments = Comments.find()
-      asyncExpect(() => expect(comments.count()).to.equal(5), onComplete)
+      // const comments = Comments.find()
+      // asyncExpect(() => expect(comments.count()).to.equal(5), onComplete)
+
+      expect(Comments.countDocuments()).to.eventually.equal(5)
 
       onComplete()
     }
@@ -107,7 +116,7 @@ describe('publishComposite', () => {
 
       comments.forEach((comment) => {
         const commentAuthor = Authors.findOne({ username: comment.author })
-        asyncExpect(() => expect(commentAuthor).to.be.defined, onComplete)
+        asyncExpect(() => expect(commentAuthor).to.not.be.undefined, onComplete)
       })
 
       onComplete()
@@ -122,7 +131,7 @@ describe('publishComposite', () => {
 
       comments.forEach((comment) => {
         const commentAuthor = Authors.findOne({ username: comment.author })
-        asyncExpect(() => expect(commentAuthor).to.be.defined, onComplete)
+        asyncExpect(() => expect(commentAuthor).to.not.be.undefined, onComplete)
       })
 
       onComplete()
@@ -156,7 +165,7 @@ describe('publishComposite', () => {
       const richardsComment = Comments.findOne({ postId: mariesSecondPost._id, author: 'richard' })
 
       Meteor.call('removeComment', richardsComment._id, (error) => {
-        asyncExpect(() => expect(error).to.not.be.defined, onComplete)
+        asyncExpect(() => expect(error).to.be.undefined, onComplete)
 
         asyncExpect(() => expect(Authors.find({ username: 'richard' }).count()).to.equal(0), onComplete)
 
@@ -177,7 +186,7 @@ describe('publishComposite', () => {
       const mariesComment = Comments.findOne({ postId: mariesSecondPost._id, author: 'marie' })
 
       Meteor.call('removeComment', mariesComment._id, (error) => {
-        asyncExpect(() => expect(error).to.not.be.defined, onComplete)
+        asyncExpect(() => expect(error).to.be.undefined, onComplete)
 
         asyncExpect(() => expect(Authors.find({ username: 'marie' }).count()).to.equal(1), onComplete)
 
@@ -193,11 +202,11 @@ describe('publishComposite', () => {
     testHandler: (onComplete) => {
       const post = Posts.findOne({ title: 'Post with no comments' })
 
-      asyncExpect(() => expect(post).to.be.defined, onComplete)
+      asyncExpect(() => expect(post).to.not.be.undefined, onComplete)
       asyncExpect(() => expect(Authors.find({ username: 'stephen' }).count()).to.equal(1), onComplete)
 
       Meteor.call('updatePostAuthor', post._id, 'marie', (error) => {
-        asyncExpect(() => expect(error).to.not.be.defined, onComplete)
+        asyncExpect(() => expect(error).to.be.undefined, onComplete)
 
         asyncExpect(() => expect(Posts.find().count()).to.equal(0), onComplete)
         asyncExpect(() => expect(Authors.find().count()).to.equal(0), onComplete)
@@ -219,7 +228,7 @@ describe('publishComposite', () => {
       asyncExpect(() => expect(Authors.find({ username: 'john' }).count()).to.equal(0), onComplete)
 
       Meteor.call('updateCommentAuthor', comment._id, 'john', (error) => {
-        asyncExpect(() => expect(error).to.not.be.defined, onComplete)
+        asyncExpect(() => expect(error).to.be.undefined, onComplete)
 
         asyncExpect(() => expect(Authors.find({ username: 'richard' }).count()).to.equal(0), onComplete)
         asyncExpect(() => expect(Authors.find({ username: 'john' }).count()).to.equal(1), onComplete)
@@ -236,13 +245,13 @@ describe('publishComposite', () => {
     testHandler: (onComplete) => {
       const mariesFirstPost = Posts.findOne({ title: 'Marie\'s first post' })
 
-      asyncExpect(() => expect(mariesFirstPost).to.be.defined, onComplete)
+      asyncExpect(() => expect(mariesFirstPost).to.not.be.undefined, onComplete)
       const oldCommentCount = Comments.find({ postId: mariesFirstPost._id, author: 'albert' }).count()
       asyncExpect(() => expect(oldCommentCount).to.equal(1), onComplete)
       asyncExpect(() => expect(Authors.find({ username: 'albert' }).count()).to.equal(1), onComplete)
 
       Meteor.call('removePost', mariesFirstPost._id, (error) => {
-        asyncExpect(() => expect(error).to.not.be.defined, onComplete)
+        asyncExpect(() => expect(error).to.be.undefined, onComplete)
 
         const newPostCount = Posts.find({ title: 'Marie\'s first post' }).count()
         asyncExpect(() => expect(newPostCount).to.equal(0), onComplete)
@@ -276,7 +285,7 @@ describe('publishComposite', () => {
       asyncExpect(() => expect(oldComments.count()).to.equal(0), onComplete)
 
       Meteor.call('updatePostAuthor', mariesFirstPost._id, 'albert', (error) => {
-        asyncExpect(() => expect(error).to.not.be.defined, onComplete)
+        asyncExpect(() => expect(error).to.be.undefined, onComplete)
 
         const newComments = Comments.find({ postId: mariesFirstPost._id })
         asyncExpect(() => expect(newComments.count()).to.be.greaterThan(0), onComplete)
@@ -296,7 +305,7 @@ describe('publishComposite', () => {
       asyncExpect(() => expect(oldComments.count()).to.be.greaterThan(0), onComplete)
 
       Meteor.call('updatePostAuthor', albertsPost._id, 'marie', (error) => {
-        asyncExpect(() => expect(error).to.not.be.defined, onComplete)
+        asyncExpect(() => expect(error).to.be.undefined, onComplete)
 
         const newComments = Comments.find({ postId: albertsPost._id })
         asyncExpect(() => expect(newComments.count()).to.equal(0), onComplete)
@@ -313,13 +322,13 @@ describe('publishComposite', () => {
       const albertsPost = Posts.findOne({ author: 'albert' })
       const oldComment = Comments.findOne({ postId: albertsPost._id })
 
-      asyncExpect(() => expect(oldComment.text).to.be.defined, onComplete)
+      asyncExpect(() => expect(oldComment.text).to.not.be.undefined, onComplete)
 
       Meteor.call('unsetCommentText', oldComment._id, (error) => {
-        asyncExpect(() => expect(error).to.not.be.defined, onComplete)
+        asyncExpect(() => expect(error).to.be.undefined, onComplete)
 
         const newComment = Comments.findOne({ postId: albertsPost._id })
-        asyncExpect(() => expect(newComment.text).to.not.be.defined, onComplete)
+        asyncExpect(() => expect(newComment.text).to.be.undefined, onComplete)
 
         onComplete()
       })
@@ -333,8 +342,8 @@ describe('publishComposite', () => {
       const albertAsAuthor = Authors.findOne({ username: 'albert' })
       const albertAsCommentAuthor = CommentAuthors.findOne({ username: 'albert' })
 
-      asyncExpect(() => expect(albertAsAuthor).to.be.defined, onComplete)
-      asyncExpect(() => expect(albertAsCommentAuthor).to.be.defined, onComplete)
+      asyncExpect(() => expect(albertAsAuthor).to.not.be.undefined, onComplete)
+      asyncExpect(() => expect(albertAsCommentAuthor).to.not.be.undefined, onComplete)
 
       onComplete()
     }
@@ -347,8 +356,8 @@ describe('publishComposite', () => {
       const marieAsAuthor = Authors.findOne({ username: 'marie' })
       const stephenAsCommentAuthor = CommentAuthors.findOne({ username: 'stephen' })
 
-      asyncExpect(() => expect(marieAsAuthor).to.be.defined, onComplete)
-      asyncExpect(() => expect(stephenAsCommentAuthor).to.not.be.defined, onComplete)
+      asyncExpect(() => expect(marieAsAuthor).to.not.be.undefined, onComplete)
+      asyncExpect(() => expect(stephenAsCommentAuthor).to.be.undefined, onComplete)
 
       onComplete()
     }
@@ -362,8 +371,8 @@ describe('publishComposite', () => {
       const mariesPost = Posts.findOne({ author: 'marie' })
       const albertsPost = Posts.findOne({ author: 'albert' })
 
-      asyncExpect(() => expect(mariesPost).to.be.defined, onComplete)
-      asyncExpect(() => expect(albertsPost).to.be.defined, onComplete)
+      asyncExpect(() => expect(mariesPost).to.not.be.undefined, onComplete)
+      asyncExpect(() => expect(albertsPost).to.not.be.undefined, onComplete)
 
       onComplete()
     }
@@ -376,8 +385,8 @@ describe('publishComposite', () => {
       const marie = Authors.findOne({ username: 'marie' })
       const albert = Authors.findOne({ username: 'albert' })
 
-      asyncExpect(() => expect(marie).to.be.defined, onComplete)
-      asyncExpect(() => expect(albert).to.be.defined, onComplete)
+      asyncExpect(() => expect(marie).to.not.be.undefined, onComplete)
+      asyncExpect(() => expect(albert).to.not.be.undefined, onComplete)
 
       onComplete()
     }

@@ -1,10 +1,45 @@
 {
-  "lockfileVersion": 1,
+  "lockfileVersion": 4,
   "dependencies": {
+    "assertion-error": {
+      "version": "2.0.1",
+      "resolved": "https://registry.npmjs.org/assertion-error/-/assertion-error-2.0.1.tgz",
+      "integrity": "sha512-Izi8RQcffqCeNVgFigKli1ssklIbpHnCYc6AknXGYoB6grJqyeby7jv12JUQgmTAnIDnbck1uxksT4dzN3PWBA=="
+    },
+    "chai": {
+      "version": "5.0.0",
+      "resolved": "https://registry.npmjs.org/chai/-/chai-5.0.0.tgz",
+      "integrity": "sha512-HO5p0oEKd5M6HEcwOkNAThAE3j960vIZvVcc0t2tI06Dd0ATu69cEnMB2wOhC5/ZyQ6m67w3ePjU/HzXsSsdBA=="
+    },
+    "check-error": {
+      "version": "2.0.0",
+      "resolved": "https://registry.npmjs.org/check-error/-/check-error-2.0.0.tgz",
+      "integrity": "sha512-tjLAOBHKVxtPoHe/SA7kNOMvhCRdCJ3vETdeY0RuAc9popf+hyaSV6ZEg9hr4cpWF7jmo/JSWEnLDrnijS9Tog=="
+    },
+    "deep-eql": {
+      "version": "5.0.1",
+      "resolved": "https://registry.npmjs.org/deep-eql/-/deep-eql-5.0.1.tgz",
+      "integrity": "sha512-nwQCf6ne2gez3o1MxWifqkciwt0zhl0LO1/UwVu4uMBuPmflWM4oQ70XMqHqnBJA+nhzncaqL9HVL6KkHJ28lw=="
+    },
+    "get-func-name": {
+      "version": "2.0.2",
+      "resolved": "https://registry.npmjs.org/get-func-name/-/get-func-name-2.0.2.tgz",
+      "integrity": "sha512-8vXOvuE167CtIc3OyItco7N/dpRtBbYOsPsXCz7X/PMnlGjYjSGuZJgM1Y7mmew7BKf9BqvLX2tnOVy1BBUsxQ=="
+    },
     "lodash.isequal": {
       "version": "4.5.0",
       "resolved": "https://registry.npmjs.org/lodash.isequal/-/lodash.isequal-4.5.0.tgz",
       "integrity": "sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ=="
+    },
+    "loupe": {
+      "version": "3.1.0",
+      "resolved": "https://registry.npmjs.org/loupe/-/loupe-3.1.0.tgz",
+      "integrity": "sha512-qKl+FrLXUhFuHUoDJG7f8P8gEMHq9NFS0c6ghXG1J0rldmZFQZoNVv/vyirE9qwCIhWZDsvEFd1sbFu3GvRQFg=="
+    },
+    "pathval": {
+      "version": "2.0.0",
+      "resolved": "https://registry.npmjs.org/pathval/-/pathval-2.0.0.tgz",
+      "integrity": "sha512-vE7JKRyES09KiunauX7nd2Q9/L7lhok4smP9RZTDeD4MVs72Dp2qNFVz39Nz5a0FVEW0BJR6C0DYrq6unoziZA=="
     }
   }
 }

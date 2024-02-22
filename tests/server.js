@@ -173,14 +173,24 @@ publishComposite('twoFixedAuthors', [
 
 publishComposite('returnNothing', () => undefined)
 
+// TODO: when the method returns on the client, in some cases
+//  the subscription still has old data in it, which makes some
+//  tests fail. The problem is that they are nonetheless still
+//  flaky. We must replace sleep with something more reliable and
+//  predictable in the frontend, using Tracker or observeChanges
+const sleep = async function (ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 /**
  * Utility methods
  */
 Meteor.methods({
-  initTestData () {
-    removeAllData()
-    initUsers()
-    initPosts()
+  async initTestData () {
+    await removeAllData()
+    await sleep(100)
+    await initUsers()
+    await initPosts()
   },
 
   log (message) {
@@ -188,27 +198,27 @@ Meteor.methods({
   }
 })
 
-function removeAllData () {
-  Comments.remove({})
-  Posts.remove({})
-  Authors.remove({})
+async function removeAllData () {
+  await Comments.removeAsync({})
+  await Posts.removeAsync({})
+  await Authors.removeAsync({})
 }
 
-function initUsers () {
-  Authors.insert({ _id: new Mongo.ObjectID(), username: 'marie' })
-  Authors.insert({ _id: new Mongo.ObjectID(), username: 'albert' })
-  Authors.insert({ _id: new Mongo.ObjectID(), username: 'richard' })
-  Authors.insert({ _id: new Mongo.ObjectID(), username: 'stephen' })
-  Authors.insert({ _id: new Mongo.ObjectID(), username: 'john' })
+async function initUsers () {
+  await Authors.insertAsync({ _id: new Mongo.ObjectID(), username: 'marie' })
+  await Authors.insertAsync({ _id: new Mongo.ObjectID(), username: 'albert' })
+  await Authors.insertAsync({ _id: new Mongo.ObjectID(), username: 'richard' })
+  await Authors.insertAsync({ _id: new Mongo.ObjectID(), username: 'stephen' })
+  await Authors.insertAsync({ _id: new Mongo.ObjectID(), username: 'john' })
 }
 
-function initPosts () {
-  insertPost('Marie\'s first post', 'marie', [{
+async function initPosts () {
+  await insertPost('Marie\'s first post', 'marie', [{
     text: 'Comment text',
     author: 'albert'
   }])
 
-  insertPost('Marie\'s second post', 'marie', [
+  await insertPost('Marie\'s second post', 'marie', [
     {
       text: 'Richard\'s comment',
       author: 'richard'
@@ -223,20 +233,20 @@ function initPosts () {
     }
   ])
 
-  insertPost('Post with one comment', 'albert', [{
+  await insertPost('Post with one comment', 'albert', [{
     text: 'Comment text',
     author: 'richard'
   }])
 
-  insertPost('Post with no comments', 'stephen')
+  await insertPost('Post with no comments', 'stephen')
 }
 
-function insertPost (title, author, comments) {
+async function insertPost (title, author, comments) {
   const postId = new Mongo.ObjectID()
   let commentId
   let commentData
 
-  Posts.insert({
+  await Posts.insertAsync({
     _id: postId,
     title,
     author
@@ -246,7 +256,42 @@ function insertPost (title, author, comments) {
     for (let i = 0; i < comments.length; i++) {
       commentId = new Mongo.ObjectID()
       commentData = Object.assign({ _id: commentId, postId }, comments[i])
-      Comments.insert(commentData)
+      await Comments.insertAsync(commentData)
     }
   }
 }
+
+/**
+ * Utility methods
+ */
+Meteor.methods({
+  async removePost (postId) {
+    console.log('calling removePost')
+    await Posts.removeAsync(postId)
+    await sleep(100)
+  },
+
+  async removeComment (commentId) {
+    console.log('calling removeComment')
+    await Comments.removeAsync(commentId)
+    await sleep(100)
+  },
+
+  async updatePostAuthor (postId, newAuthor) {
+    console.log(`calling updatePostAuthor, postId: ${postId}, newAuthor: ${newAuthor}`)
+    await Posts.updateAsync({ _id: postId }, { $set: { author: newAuthor } })
+    await sleep(100)
+  },
+
+  async updateCommentAuthor (commentId, newAuthor) {
+    console.log(`calling updateCommentAuthor, commentId: ${commentId}, newAuthor: ${newAuthor}`)
+    await Comments.updateAsync({ _id: commentId }, { $set: { author: newAuthor } })
+    await sleep(100)
+  },
+
+  async unsetCommentText (commentId) {
+    console.log(`calling unsetCommentText, commentId: ${commentId}`)
+    await Comments.updateAsync({ _id: commentId }, { $unset: { text: '' } })
+    await sleep(100)
+  }
+})
