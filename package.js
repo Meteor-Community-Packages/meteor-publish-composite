@@ -37,7 +37,8 @@ Package.onUse((api) => {
 Package.onTest((api) => {
   Npm.depends({
     'lodash.isequal': '4.5.0',
-    chai: '5.0.0'
+    'chai-as-promised': '7.1.1',
+    chai: '4.3.10'
   })
   api.use([
     'ecmascript',
@@ -45,7 +46,7 @@ Package.onTest((api) => {
     'mongo'
   ], ['client', 'server'])
   api.use([
-    'meteortesting:mocha-core@8.2.0-beta300.0'
+    'meteortesting:mocha@3.0.3-beta300.0'
   ], 'client')
   api.use([
     'reywood:publish-composite',
