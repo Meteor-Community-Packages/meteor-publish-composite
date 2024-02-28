@@ -1,6 +1,6 @@
 {
   "name": "publish-composite",
-  "version": "1.8.5-beta.2",
+  "version": "1.8.7",
   "private": true,
   "repository": {
     "type": "git",
@@ -35,11 +35,11 @@
     }
   },
   "devDependencies": {
-    "@babel/core": "^7.23.2",
-    "@babel/eslint-parser": "^7.22.15",
-    "@babel/preset-env": "^7.23.2",
+    "@babel/core": "^7.23.9",
+    "@babel/eslint-parser": "^7.23.10",
+    "@babel/preset-env": "^7.23.9",
     "all-contributors-cli": "^6.26.1",
-    "chai": "^4.3.10",
+    "chai": "^4.4.1",
     "chai-as-promised": "^7.1.1",
     "husky": "^8.0.3",
     "lodash.isequal": "^4.5.0",

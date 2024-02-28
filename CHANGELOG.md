@@ -1,3 +1,9 @@
+## v1.8.7
+* `valueOfId` moved to `utils.js`
+* Fixed race condition waiting for documents to be added [PR](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/179) [@redabourial](https://github.com/redabourial)
+* Fix conflicting cursor events [PR](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/177) [@gabrielcazacu96](https://github.com/gabrielcazacu96)
+* Fixed test dependencies [PR](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/178) [@manueltimita](https://github.com/manueltimita)
+
 ## v1.8.6
 * Fixed `this.ready()` being fired too early [PR](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/174) [manueltimita](https://github.com/manueltimita)
 * Added `ddp` dependency that is needed for Meteor 3.0 and version support for Meteor `3.0-beta.0` [@storytellercz](https://github.com/sponsors/StorytellerCZ)
