@@ -2,7 +2,7 @@
 import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
 import { expect } from 'chai'
-import {Authors, Comments, Groups, Posts} from './common'
+import { Authors, Comments, Groups, Posts } from './common'
 
 const Articles = new Mongo.Collection('articles')
 const CommentAuthors = new Mongo.Collection('commentAuthors')

@@ -227,7 +227,7 @@ async function initGroups () {
 async function insertGroup (groupId) {
   await Groups.insertAsync({
     _id: groupId,
-    authors: [],
+    authors: []
   })
 }
 
@@ -244,7 +244,7 @@ async function insertUser (username, groupId = 'Writers') {
   await Authors.insertAsync({
     _id: userId,
     username,
-    groupIds: [groupId],
+    groupIds: [groupId]
   })
   if (groupId) {
     await Groups.updateAsync({ _id: groupId }, { $push: { authors: username } })
