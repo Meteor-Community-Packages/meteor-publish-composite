@@ -191,7 +191,7 @@ publishComposite('returnNothing', () => undefined)
 //  tests fail. The problem is that they are nonetheless still
 //  flaky. We must replace sleep with something more reliable and
 //  predictable in the frontend, using Tracker or observeChanges
-const sleep = async function (ms = 50) {
+const sleep = async function (ms = 100) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
@@ -227,6 +227,7 @@ async function initGroups () {
 async function insertGroup (groupId) {
   await Groups.insertAsync({
     _id: groupId,
+    authors: [],
   })
 }
 
@@ -245,6 +246,9 @@ async function insertUser (username, groupId = 'Writers') {
     username,
     groupIds: [groupId],
   })
+  if (groupId) {
+    await Groups.updateAsync({ _id: groupId }, { $push: { authors: username } })
+  }
 }
 
 async function initPosts () {
@@ -303,37 +307,39 @@ Meteor.methods({
   async removePost (postId) {
     console.log('calling removePost')
     await Posts.removeAsync(postId)
-    await sleep(100)
+    await sleep()
   },
 
   async removeComment (commentId) {
     console.log('calling removeComment')
     await Comments.removeAsync(commentId)
-    await sleep(100)
+    await sleep()
   },
 
   async addAuthorToGroup (username, groupId) {
     console.log(`calling addAuthorToGroup, username: ${username}, groupId: ${groupId}`)
     await Authors.updateAsync({ username }, { $push: { groupIds: groupId } })
-    await sleep(100)
+    await Groups.updateAsync({ _id: groupId }, { $push: { authors: username } })
+    await sleep()
   },
 
   async removeAuthorFromGroup (username, groupId) {
     console.log(`calling addAuthorToGroup, username: ${username}, groupId: ${groupId}`)
     await Authors.updateAsync({ username }, { $pull: { groupIds: groupId } })
-    await sleep(100)
+    await Groups.updateAsync({ _id: groupId }, { $pull: { authors: username } })
+    await sleep()
   },
 
   async updatePostAuthor (postId, newAuthor) {
     console.log(`calling updatePostAuthor, postId: ${postId}, newAuthor: ${newAuthor}`)
     await Posts.updateAsync({ _id: postId }, { $set: { author: newAuthor } })
-    await sleep(100)
+    await sleep()
   },
 
   async updateCommentAuthor (commentId, newAuthor) {
     console.log(`calling updateCommentAuthor, commentId: ${commentId}, newAuthor: ${newAuthor}`)
     await Comments.updateAsync({ _id: commentId }, { $set: { author: newAuthor } })
-    await sleep(100)
+    await sleep()
   },
 
   async unsetCommentText (commentId) {

@@ -58,6 +58,13 @@ describe('publishComposite', () => {
     return tryExpect(() => expect(value).to.not.be.undefined, onComplete)
   }
 
+  const validateAuthorsGroups = (groupId, count, onComplete) => {
+    const group = Groups.findOne({ _id: groupId })
+    expectValueToBeDefined(group, onComplete)
+    tryExpect(() => expect(group.authors.length).to.equal(count), onComplete)
+    expectCursorCountToEqual(Authors.find({ groupIds: groupId }), count, onComplete)
+  }
+
   /**
    * Define tests
    */
@@ -75,8 +82,8 @@ describe('publishComposite', () => {
     publication: 'allGroups',
 
     testHandler: (onComplete) => {
-      expectCursorCountToEqual(Authors.find({ groupIds: 'Writers' }), 4, onComplete)
-      expectCursorCountToEqual(Authors.find({ groupIds: 'Editors' }), 1, onComplete)
+      validateAuthorsGroups('Writers', 4, onComplete)
+      validateAuthorsGroups('Editors', 1, onComplete)
 
       onComplete()
     }
@@ -86,12 +93,12 @@ describe('publishComposite', () => {
     publication: 'allGroups',
 
     testHandler: (onComplete) => {
-      expectCursorCountToEqual(Authors.find({ groupIds: 'Editors' }), 1, onComplete)
+      validateAuthorsGroups('Editors', 1, onComplete)
 
       Meteor.call('addAuthorToGroup', 'stephen', 'Editors', (error) => {
         expectValueToBeUndefined(error, onComplete)
-        expectCursorCountToEqual(Authors.find({ groupIds: 'Writers' }), 4, onComplete)
-        expectCursorCountToEqual(Authors.find({ groupIds: 'Editors' }), 2, onComplete)
+        validateAuthorsGroups('Writers', 4, onComplete)
+        validateAuthorsGroups('Editors', 2, onComplete)
 
         onComplete()
       })
@@ -102,11 +109,11 @@ describe('publishComposite', () => {
     publication: 'allGroups',
 
     testHandler: (onComplete) => {
-      expectCursorCountToEqual(Authors.find({ groupIds: 'Writers' }), 4, onComplete)
+      validateAuthorsGroups('Writers', 4, onComplete)
 
       Meteor.call('removeAuthorFromGroup', 'richard', 'Writers', (error) => {
         expectValueToBeUndefined(error, onComplete)
-        expectCursorCountToEqual(Authors.find({ groupIds: 'Writers' }), 3, onComplete)
+        validateAuthorsGroups('Writers', 3, onComplete)
 
         onComplete()
       })
@@ -117,23 +124,22 @@ describe('publishComposite', () => {
     publication: 'allGroups',
 
     testHandler: (onComplete) => {
-      expectCursorCountToEqual(Authors.find({ groupIds: 'Editors' }), 1, onComplete)
+      validateAuthorsGroups('Editors', 1, onComplete)
 
       Meteor.call('addAuthorToGroup', 'stephen', 'Editors', (error) => {
         expectValueToBeUndefined(error, onComplete)
-        expectCursorCountToEqual(Authors.find({ groupIds: 'Editors' }), 2, onComplete)
+        validateAuthorsGroups('Editors', 2, onComplete)
 
         Meteor.call('removeAuthorFromGroup', 'stephen', 'Editors', (error) => {
           expectValueToBeUndefined(error, onComplete)
-          expectCursorCountToEqual(Authors.find({ groupIds: 'Editors' }), 1, onComplete)
+          validateAuthorsGroups('Editors', 1, onComplete)
 
-          // Meteor.call('removeAuthorFromGroup', 'john', 'Editors', (error) => {
-          //   expectValueToBeUndefined(error, onComplete)
-          //   expectCursorCountToEqual(Authors.find({ groupIds: 'Editors' }), 0, onComplete)
-          //
-          //   onComplete()
-          // })
-          onComplete()
+          Meteor.call('removeAuthorFromGroup', 'john', 'Editors', (error) => {
+            expectValueToBeUndefined(error, onComplete)
+            validateAuthorsGroups('Editors', 0, onComplete)
+
+            onComplete()
+          })
         })
       })
     }
