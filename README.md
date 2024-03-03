@@ -269,6 +269,16 @@ This package is great for publishing small sets of related documents. If you use
 
 You will not be able to access `this.userId` inside your `find` functions if you use [arrow functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions).
 
+## Testing
+
+Run the following:
+```shell
+meteor test-packages reywood:publish-composite --driver-package meteortesting:mocha
+```
+The tests are executing a combination of methods and subscriptions. The quickest option was to add a pause after each
+operation (see usage of `sleep()` in `./tests/server.js`), to allow for the publications to send down all the
+documents. However, this is flaky, so you may want to refresh the browser if you notice tests failing for no 
+apparent reason.
 
 ## Reporting issues/bugs
 
