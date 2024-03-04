@@ -1,3 +1,7 @@
+## v1.8.8
+* Revert "Fix for conflicting cursor events #177" [PR](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/182) [@manueltimita](https://github.com/manueltimita)
+* Bump `versionsFrom` compat for Meteor 3.0-beta.6 [@storytellercz](https://github.com/sponsors/StorytellerCZ)
+
 ## v1.8.7
 * `valueOfId` moved to `utils.js`
 * Fixed race condition waiting for documents to be added [PR](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/179) [@redabourial](https://github.com/redabourial)
