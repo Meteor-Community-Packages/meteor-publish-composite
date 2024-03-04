@@ -36,8 +36,6 @@ Package.onUse((api) => {
 // meteor test-packages reywood:publish-composite --driver-package meteortesting:mocha
 Package.onTest((api) => {
   Npm.depends({
-    'lodash.isequal': '4.5.0',
-    'chai-as-promised': '7.1.1',
     chai: '4.3.10'
   })
   api.use([
