@@ -1,3 +1,7 @@
+## v1.8.9
+* Update `zodern:types` to v1.0.13 [@storytellercz](https://github.com/sponsors/StorytellerCZ)
+* Bump `versionsFrom` compat for Meteor 3.0-rc.0 [@storytellercz](https://github.com/sponsors/StorytellerCZ)
+
 ## v1.8.8
 * Revert "Fix for conflicting cursor events #177" [PR](https://github.com/Meteor-Community-Packages/meteor-publish-composite/pull/182) [@manueltimita](https://github.com/manueltimita)
 * Bump `versionsFrom` compat for Meteor 3.0-beta.6 [@storytellercz](https://github.com/sponsors/StorytellerCZ)
