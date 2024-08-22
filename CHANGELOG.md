@@ -1,3 +1,7 @@
+## v1.8.11
+* Bump development dependencies [@storytellercz](https://github.com/sponsors/StorytellerCZ)
+* `Npm.require` to `import` for lodash [@storytellercz](https://github.com/sponsors/StorytellerCZ)
+
 ## v1.8.10
 * Bump `versionsFrom` compat for Meteor 3.0 [@storytellercz](https://github.com/sponsors/StorytellerCZ)
 * Update `meteortesting:mocha` to v3.2.0 [@storytellercz](https://github.com/sponsors/StorytellerCZ)

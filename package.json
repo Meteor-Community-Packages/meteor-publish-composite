@@ -1,6 +1,6 @@
 {
   "name": "publish-composite",
-  "version": "1.8.10",
+  "version": "1.8.11",
   "private": true,
   "repository": {
     "type": "git",
@@ -15,7 +15,7 @@
     "test:package": "meteor test-packages ./ --driver-package cultofcoders:mocha",
     "lint": "./node_modules/.bin/standard --fix",
     "lint:test": "./node_modules/.bin/standard",
-    "publish": "npm prune --production && meteor publish && meteor npm i",
+    "publish": "npm prune --omit=dev && meteor publish && meteor npm i",
     "all-contributors": "./node_modules/.bin/all-contributors",
     "all-contributors-generate": "./node_modules/.bin/all-contributors generate"
   },
@@ -35,12 +35,12 @@
     }
   },
   "devDependencies": {
-    "@babel/core": "^7.23.9",
-    "@babel/eslint-parser": "^7.23.10",
-    "@babel/preset-env": "^7.23.9",
+    "@babel/core": "^7.25.2",
+    "@babel/eslint-parser": "^7.25.1",
+    "@babel/preset-env": "^7.25.4",
     "all-contributors-cli": "^6.26.1",
-    "chai": "^4.4.1",
-    "chai-as-promised": "^7.1.1",
+    "chai": "^4.5.0",
+    "chai-as-promised": "^7.1.2",
     "husky": "^8.0.3",
     "lodash.isequal": "^4.5.0",
     "standard": "^17.1.0"
