@@ -1,3 +1,8 @@
+## v1.8.10
+* Bump `versionsFrom` compat for Meteor 3.0 [@storytellercz](https://github.com/sponsors/StorytellerCZ)
+* Update `meteortesting:mocha` to v3.2.0 [@storytellercz](https://github.com/sponsors/StorytellerCZ)
+* Small performance improvement in `onStop` [@storytellercz](https://github.com/sponsors/StorytellerCZ)
+
 ## v1.8.9
 * Update `zodern:types` to v1.0.13 [@storytellercz](https://github.com/sponsors/StorytellerCZ)
 * Bump `versionsFrom` compat for Meteor 3.0-rc.0 [@storytellercz](https://github.com/sponsors/StorytellerCZ)
