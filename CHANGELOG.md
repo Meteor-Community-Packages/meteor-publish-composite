@@ -1,3 +1,6 @@
+## v1.8.12
+* `Npm.depends` placement fix in `package.js`
+
 ## v1.8.11
 * Bump development dependencies [@storytellercz](https://github.com/sponsors/StorytellerCZ)
 * `Npm.require` to `import` for lodash [@storytellercz](https://github.com/sponsors/StorytellerCZ)
