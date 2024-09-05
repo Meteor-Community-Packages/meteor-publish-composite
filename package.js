@@ -2,7 +2,7 @@
 Package.describe({
   name: 'reywood:publish-composite',
   summary: 'Publish a set of related documents from multiple collections with a reactive join.',
-  version: '1.8.11',
+  version: '1.8.12',
   git: 'https://github.com/Meteor-Community-Packages/meteor-publish-composite'
 })
 
@@ -36,9 +36,6 @@ Package.onUse((api) => {
 
 // meteor test-packages reywood:publish-composite --driver-package meteortesting:mocha
 Package.onTest((api) => {
-  Npm.depends({
-    chai: '4.3.10'
-  })
   api.use([
     'ecmascript',
     'modules',
