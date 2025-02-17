@@ -12,7 +12,7 @@
   "homepage": "https://github.com/Meteor-Community-Packages/meteor-publish-composite#readme",
   "scripts": {
     "test": "npm run lint && npm run test:package",
-    "test:package": "meteor test-packages ./ --driver-package cultofcoders:mocha",
+    "test:package": "meteor test-packages ./ --driver-package meteortesting:mocha",
     "lint": "./node_modules/.bin/standard --fix",
     "lint:test": "./node_modules/.bin/standard",
     "publish": "npm prune --omit=dev && meteor publish && meteor npm i",
@@ -42,7 +42,6 @@
     "chai": "^4.5.0",
     "chai-as-promised": "^7.1.2",
     "husky": "^8.0.3",
-    "lodash.isequal": "^4.5.0",
     "standard": "^17.1.2"
   }
 }
