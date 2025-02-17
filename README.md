@@ -35,7 +35,7 @@ Arguments
 
     The name of the publication
 
-* **`options`** -- *object literal or callback function*
+* **`options`** -- *object literal or callback function (supports async)*
 
     An object literal specifying the configuration of the composite publication **or** a function that returns said object literal. If a function is used, it will receive the arguments passed to `Meteor.subscribe('myPub', arg1, arg2, ...)` (much like the `func` argument of [`Meteor.publish`](http://docs.meteor.com/#meteor_publish)). Basically, if your publication will take **no** arguments, pass an object literal for this argument. If your publication **will** take arguments, use a function that returns an object literal.
 
@@ -45,7 +45,7 @@ Arguments
 
         A function that returns a MongoDB cursor (e.g., `return Meteor.users.find({ active: true });`)
 
-    * **`children`** -- *array (optional)* or *function*
+    * **`children`** -- *array (optional)* or *function (supports async)*
 
         - An array containing any number of object literals with this same structure
         - A function with top level documents as arguments. It helps dynamically build
@@ -103,9 +103,15 @@ Arguments
       find() {
           return Notifications.find();
       },
-      children(parentNotification) {
-        // children is a function that returns an array of objects.
+      async children(parentNotification) {
+        // children is a function (can be asynchronous) that returns an array of objects.
         // It takes parent documents as arguments and dynamically builds children array.
+        const userAllowsNotifications = await CustomUserLibrary.allowsNotifications(); // async children function allows the use of await to dynamically build children array
+
+        if (!userAllowsNotifications) {
+          return [];
+        }
+    
         if (parentNotification.type === 'about_post') {
           return [{
             find(notification) {
@@ -254,6 +260,7 @@ publishComposite('postsByUser', async function(userId) {
         },
         children: [
             // This section will be similar to that of the previous example.
+            // Note from above, children can be a function (optionally async) in order to dynamically build the children array
         ]
     }
 });
