@@ -106,7 +106,9 @@ Arguments
       async children(parentNotification) {
         // children is a function (can be asynchronous) that returns an array of objects.
         // It takes parent documents as arguments and dynamically builds children array.
-        const userAllowsNotifications = await CustomUserLibrary.allowsNotifications(); // async children function allows the use of await to dynamically build children array
+
+        // async children function allows the use of await to dynamically build children array
+        const userAllowsNotifications = await CustomUserLibrary.allowsNotifications(); 
 
         if (!userAllowsNotifications) {
           return [];
