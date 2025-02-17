@@ -2,12 +2,12 @@
 Package.describe({
   name: 'reywood:publish-composite',
   summary: 'Publish a set of related documents from multiple collections with a reactive join.',
-  version: '1.8.12',
+  version: '1.9.0',
   git: 'https://github.com/Meteor-Community-Packages/meteor-publish-composite'
 })
 
 Npm.depends({
-  'lodash.isequal': '4.5.0'
+  'lodash.isequal': '4.5.8'
 })
 
 Package.onUse((api) => {

@@ -1,3 +1,9 @@
+## v1.9.0
+
+* Add `await` for `children()` option by [@arianjahiri](https://github.com/arianjahiri)
+* Update `lodash.isequal` to v4.5.8 [@storytellercz](https://github.com/sponsors/StorytellerCZ)
+* Update dev dependencies
+
 ## v1.8.12
 * `Npm.depends` placement fix in `package.js`
 
