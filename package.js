@@ -39,13 +39,15 @@ Package.onTest((api) => {
   ], ['client', 'server'])
   api.use([
     'meteortesting:mocha@3.2.0'
-  ], 'client')
+  ], ['client', 'server'])
   api.use([
     'reywood:publish-composite',
-    'underscore'
+    'underscore',
+    'ddp-client'
   ], 'server')
 
   api.addFiles('tests/common.js', ['client', 'server'])
   api.addFiles('tests/client.js', 'client')
   api.addFiles('tests/server.js', 'server')
+  api.addFiles('tests/server_observers.js', 'server')
 })
