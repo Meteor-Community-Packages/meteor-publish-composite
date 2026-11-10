@@ -39,7 +39,7 @@ Package.onTest((api) => {
   ], ['client', 'server'])
   api.use([
     'meteortesting:mocha@3.2.0'
-  ], 'client')
+  ], ['client', 'server'])
   api.use([
     'reywood:publish-composite',
     'underscore'
