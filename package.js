@@ -48,4 +48,5 @@ Package.onTest((api) => {
   api.addFiles('tests/common.js', ['client', 'server'])
   api.addFiles('tests/client.js', 'client')
   api.addFiles('tests/server.js', 'server')
+  api.addFiles('tests/server_event_order.js', 'server')
 })
